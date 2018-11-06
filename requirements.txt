@@ -1,1 +1,2 @@
-python-registry  # or better latest Version (1.2) from https://github.com/williballenthin/python-registry/archive/master.zip
+python-registry
+# or better latest Version (1.2) from https://github.com/williballenthin/python-registry/archive/master.zip
