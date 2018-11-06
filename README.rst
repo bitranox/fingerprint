@@ -81,3 +81,6 @@ REMARKS
 You might record quite some noise - there is no filter to sort it out at the moment. On the other hand - I would hide exactly in the noise, so I left it
 
 Procmon Logfiles can get quite big - You might set some appropriate filters there.
+
+On my Windows 10 Machine from about 300.000 Registry Values some hundreds are not readable - just ignore those errors, its mostly device- or network drivers. I told Willi from python-registry about it, it might be fixed in the future.
+
