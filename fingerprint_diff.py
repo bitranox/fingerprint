@@ -31,7 +31,7 @@ def get_commandline_parameters():
     args = parser.parse_args()
     return args
 
-def get_logfile_fullpath(fingerprint_result_dir:str, fingerprint_name_1:str, fingerprint_name_2:str )->str:
+def get_logfile_fullpath(fingerprint_result_dir:str, fingerprint_name_1:str, fingerprint_name_2:str)->str:
     """
     >>> fingerprint_result_dir = 'c:/test'
     >>> fingerprint_name_1 = 'test'

@@ -1,4 +1,3 @@
-import winreg
 from winreg import *
 
 def get_number_of_subkeys(key:HKEYType)->int:

@@ -1,6 +1,5 @@
 import csv
 from lib_doctest import *
-from lib_fingerprint_registry import FingerPrintRegistry
 from lib_helper_functions import *
 import logging
 import os

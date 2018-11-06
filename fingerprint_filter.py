@@ -89,6 +89,7 @@ def main(procmon_csv:str,
     logger.info('Finished\n\n')
     input('enter for exit, check the logfile')
 
+
 if __name__ == '__main__':
     commandline_args = get_commandline_parameters()
     main(procmon_csv=commandline_args.procmon_csv,

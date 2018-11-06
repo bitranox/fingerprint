@@ -101,7 +101,8 @@ class RegistryDiff(object):
             l_dict_data_diff = l_dict_data_diff + self.get_l_deleted_registry_info(hashed_dict_fingerprint_1)
         return l_dict_data_diff
 
-    def get_l_deleted_registry_info(self, hashed_dict_fingerprint_result_filename_1)->[{}]:
+    @staticmethod
+    def get_l_deleted_registry_info(hashed_dict_fingerprint_result_filename_1)->[{}]:
         l_dict_registry_info:[{}] = list()
         # remaining entries were deleted
         for path, dict_registry_info in hashed_dict_fingerprint_result_filename_1.items():

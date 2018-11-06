@@ -28,9 +28,10 @@ def is_run_as_admin()->bool:
 
 def is_run_as_admin2() -> bool:
     if os.name == 'nt':
+        # noinspection PyBroadException
         try:
             # only windows users with admin privileges can read the C:\windows\temp
-            temp = os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
+            os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
         except Exception:
             return False
         else:
@@ -79,6 +80,7 @@ def config_console_logger():
 
 def config_file_logger(logfile_fullpath:str):
     logfile_dir = os.path.dirname(logfile_fullpath)
+    # noinspection PyBroadException
     try:
         if not os.path.isdir(logfile_dir):
             os.makedirs(logfile_dir, exist_ok=True)

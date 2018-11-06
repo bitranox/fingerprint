@@ -1,7 +1,6 @@
 from lib_runcommand import run_command
 from lib_helper_functions import *
 import logging
-import time
 logger = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 
