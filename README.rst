@@ -44,7 +44,7 @@ See `License file <https://github.com/bitranox/fingerprint/blob/master/LICENSE>`
 
 
 SAMPLE SESSION
--
+--------------
 
 
 Lets make s walk-through by example. Lets assume we have a software with "Trial Period" and the Software stops working after the trial period. 
@@ -66,7 +66,7 @@ all programs are started from the commandline. Use <command> -h for showing the 
 - STEP7 - create fingerprint after run the software until expiration message named "reinstall-expired",
   use procmon to create "procmon-reinstall-expired.csv"
 - STEP8 - compare Snapshots and Filter Procmon Logs
-use "fingerprint-diff.exe" to analyze the changes between different steps.
+  use "fingerprint-diff.exe" to analyze the changes between different steps.
 
 In this particular case, create a diff between "before-install" and "uninstall" - the diff files will now state all system changes between the clean machine and the state after uninstalling the software.
 
@@ -74,3 +74,10 @@ In this particular case, create a diff between "before-install" and "uninstall" 
 
 Now filter the differences with the procmon logfile "procmon-reinstall-expired.csv" - so You will identify which of the remaining files or registry keys were accessed.
  
+
+REMARKS
+-------
+
+You might record quite some noise - there is no filter to sort it out at the moment. On the other hand - I would hide exactly in the noise, so I left it
+
+Procmon Logfiles can get quite big - You might set some appropriate filters there.
