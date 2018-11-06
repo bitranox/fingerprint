@@ -10,12 +10,12 @@ All registry keys and values are stored in a second file. Different Fingerprints
 
 All fingerprints are stored in csv, Excel compatible format, for convenient filtering, sorting, etc.
 
-sources are included, but You just might use the .exe files created with pyinstaller 
+sources are included, but You just might use the .exe files created with pyinstaller from `Releases <https://github.com/bitranox/fingerprint/releases>`_
 
 Installation
 ------------
 
-no installation required, just use the .exe files from dist directory
+no installation required, just use the .exe files from `Releases <https://github.com/bitranox/fingerprint/releases>`_
 
 Requirements
 ---------------
