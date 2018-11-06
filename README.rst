@@ -40,7 +40,7 @@ License
 
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
 
-See `License file <https://github.com/bitranox/fingerprint/blob/master/LICENSE.txt>`_
+See `License file <https://github.com/bitranox/fingerprint/blob/master/LICENSE>`_
 
 
 SAMPLE SESSION
