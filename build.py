@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)-12s %(level
 
 ls_commands = ['pyinstaller --onefile fingerprint.py -y',
                'pyinstaller --onefile fingerprint_diff.py -y',
-               'pyinstaller --onefile fingerprint_filter_procmon.py -y']
+               'pyinstaller --onefile fingerprint_filter.py -y']
 
 for s_command in ls_commands:
     response = run_command(s_command)

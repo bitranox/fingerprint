@@ -1,5 +1,7 @@
-# fingerprint - track the changes of Your Windows System
-forensic analytics for windows registry and files.
+fingerprint
+=================
+
+Monitoring Registry and File Changes in Windows - forensic analytics for windows registry and files.
 
 I wrote this software because those I found in the wild are either too slow, undocumented, or expansive.
 
