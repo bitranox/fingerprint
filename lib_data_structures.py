@@ -9,6 +9,7 @@ class DataStructFileInfo(object):
         self.accessed: datetime = datetime(1980, 1, 1, 0, 0, 0)
         self.status:str = ''
         self.change:str = ''    # ADDED, DELETED, MODIFIED (only filled in DIFF Files)
+        self.hash:str = ''
 
     @property
     def set_created(self):
@@ -43,6 +44,7 @@ class DataStructFileInfo(object):
         data_dict['accessed'] = self.accessed
         data_dict['status'] = self.status
         data_dict['change'] = self.change
+        data_dict['hash'] = self.hash
         return data_dict
 
     """

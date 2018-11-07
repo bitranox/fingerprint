@@ -2,7 +2,7 @@ import csv
 import glob
 from lib_data_structures import *
 from lib_helper_functions import *
-
+from lib_hash import get_file_hash
 
 class FingerPrintFiles(object):
     def __init__(self, fingerprint_name:str, fingerprint_result_dir:str, fingerprint_drive:str):
@@ -31,7 +31,7 @@ class FingerPrintFiles(object):
         file_fingerprint_name = self.get_file_fingerprint_result_filename()
         with open(file_fingerprint_name, 'w', encoding='utf-8',newline='') as f_out:
 
-            fieldnames = ['path', 'size', 'created', 'modified', 'accessed', 'status','change']
+            fieldnames = ['path', 'size', 'created', 'modified', 'accessed', 'status','hash','change']
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
             csv_writer.writeheader()
 
@@ -60,6 +60,7 @@ class FingerPrintFiles(object):
 
         fileinfo = DataStructFileInfo()
         fileinfo.path = filename
+        fileinfo.hash = get_file_hash(filename)
 
         for attribute,file_property_function in dict_attribute_functions.items():
             try:

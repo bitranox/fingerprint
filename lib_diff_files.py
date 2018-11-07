@@ -84,6 +84,9 @@ class FileDiff(object):
                         l_changed.append('Created changed from {} to {}'.format(dict_data_result_1['created'], dict_data_result_2['created']))
                     if dict_data_result_1['modified'] != dict_data_result_2['modified']:
                         l_changed.append('Modified changed from {} to {}'.format(dict_data_result_1['modified'], dict_data_result_2['modified']))
+                    if dict_data_result_1['hash'] != dict_data_result_2['hash']:
+                        l_changed.append('Hash (Content) changed')
+
                     if l_changed:
                         fileinfo = self.get_fileinfo_from_dict(dict_data_result_2)
                         fileinfo.change = ', '.join(l_changed)
@@ -120,7 +123,7 @@ class FileDiff(object):
     def write_diff_csv_file(self, l_fileinfo:[DataStructFileInfo]):
         diff_result_filename = self.get_diff_result_filename()
         with open(diff_result_filename, 'w', encoding='utf-8',newline='') as f_out:
-            fieldnames = ['path', 'size', 'created', 'modified', 'accessed', 'status','change']
+            fieldnames = ['path', 'size', 'created', 'modified', 'accessed', 'status','hash','change']
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames)
             csv_writer.writeheader()
             for fileinfo in l_fileinfo:
