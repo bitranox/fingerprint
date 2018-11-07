@@ -22,7 +22,7 @@ def get_commandline_parameters():
     parser.add_argument('positional_ignored', type=str, nargs='*', help='Positional Arguments are ignored')
     parser.add_argument('--procmon_csv', type=str, required=False, default='', help='name of the procmon Logfile, e.g. "procmon-logfile.CSV"')
     parser.add_argument('--fingerprint_file_csv', type=str, required=False, default='', help='name of the fingerprint for files, e.g. "test_c_files.csv"')
-    parser.add_argument('--fingerprint_reg_csv', type=str, required=False, default='c:/', help='name of the fingerprint for registry, e.g. "test_registry.csv"')
+    parser.add_argument('--fingerprint_reg_csv', type=str, required=False, default='', help='name of the fingerprint for registry, e.g. "test_registry.csv"')
     parser.add_argument('--target', type=str, required=False, default='c:/fingerprint',help='Fingerprint Target Directory, e.g. "c:\\fingerprint"')
     args = parser.parse_args()
     return args
@@ -41,10 +41,18 @@ def get_logfile_fullpath(fingerprint_result_dir, procmon_csv:str, fingerprint_fi
     >>> fingerprint_reg_csv = 'test_registry'
     >>> get_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
     'c:/fingerprint/PM_procmon-logfile_FPF_test_c_files_FPR_test_registry.log'
+
+    >>> procmon_csv = 'procmon-logfile.csv'
+    >>> fingerprint_file_csv = 'test_c_files.csv'
+    >>> fingerprint_reg_csv = 'test_registry.csv'
+    >>> get_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
+    'c:/fingerprint/PM_procmon-logfile_FPF_test_c_files_FPR_test_registry.log'
+
+
     """
     procmon_csv = procmon_csv.lower().rsplit('.csv',1)[0]
-    fingerprint_file_csv = fingerprint_file_csv.rsplit('.csv', 1)[0]
-    fingerprint_reg_csv = fingerprint_reg_csv.rsplit('.csv', 1)[0]
+    fingerprint_file_csv = fingerprint_file_csv.lower().rsplit('.csv', 1)[0]
+    fingerprint_reg_csv = fingerprint_reg_csv.lower().rsplit('.csv', 1)[0]
     logfile_fullpath = convert_path_to_posix(os.path.join(fingerprint_result_dir, ('PM_{}_FPF_{}_FPR_{}.log'.format(procmon_csv, fingerprint_file_csv, fingerprint_reg_csv))))
     return logfile_fullpath
 
@@ -69,13 +77,16 @@ def main(procmon_csv:str,
     logger.info('filter procmon logfile from fingerprints')
 
     if not procmon_csv:
-        procmon_csv = input('name of the procmon logfile: ')
+        procmon_csv = input('filename of the procmon logfile csv (e.g. procmon-test1.csv): ')
     if not fingerprint_file_csv:
-        fingerprint_file_csv = input('name of the file fingerprint: ')
+        fingerprint_file_csv = input('filename of the file fingerprint (e.g. test_c_files.csv): ')
     if not fingerprint_reg_csv:
-        fingerprint_reg_csv = input('name of the registry fingerprint: ')
+        fingerprint_reg_csv = input('filename of the registry fingerprint (e.g. test_registry.csv): ')
 
-    logfile_fullpath = get_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
+    logfile_fullpath = get_logfile_fullpath(fingerprint_result_dir=fingerprint_result_dir,
+                                            procmon_csv=procmon_csv,
+                                            fingerprint_file_csv=fingerprint_file_csv,
+                                            fingerprint_reg_csv=fingerprint_reg_csv)
     config_file_logger(logfile_fullpath)
 
     logger.info('filtering {}, {} and {}'.format(fingerprint_file_csv, fingerprint_reg_csv, procmon_csv))
