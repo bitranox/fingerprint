@@ -1,6 +1,18 @@
 Changelog
 =========
 
+1.0.4
+-----
+2018-11-07: added file hashing
+
+1.0.3
+-----
+2018-11-07: fixing bugs
+
+1.0.2
+-----
+2018-11-07: fixing bugs
+
 1.0.1
 -----
 2018-11-07: fixed typos, clarify commandline parameters
