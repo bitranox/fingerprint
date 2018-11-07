@@ -5,7 +5,7 @@ Monitoring Registry and File Changes in Windows - forensic analytics for windows
 
 I wrote this software because those I found in the wild are either too slow, undocumented, or expansive.
 
-"fingerprint" records the state of the system, by saving all filenames, file sizes, creation, access and modify dates in a csv file. 
+"fingerprint" records the state of the system, by saving all filenames, file sizes, creation, access and modify dates als also a hash of the data in a csv file.
 All registry keys and values are stored in a second file. Different Fingerprints can be compared and filtered with procmon logfiles to analyze what and when the system was changed.
 
 All fingerprints are stored in csv, Excel compatible format, for convenient filtering, sorting, etc.
