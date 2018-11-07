@@ -71,7 +71,7 @@ def main(fingerprint_name:str,
     logger.info('field_length_limit   : {}'.format(field_length_limit))
 
     if not fingerprint_name:
-        fingerprint_name = input('name of the fingerprint: ')
+        fingerprint_name = input('name of the fingerprint (e.g. test1): ')
 
     logger.info('fingerprint_name     : {}'.format(fingerprint_name))
 

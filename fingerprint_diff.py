@@ -68,9 +68,9 @@ def main(fingerprint_name_1:str,
                 .format(fingerprint_drive, fingerprint_result_dir, field_length_limit, check_modified))
 
     if not fingerprint_name_1:
-        fingerprint_name_1 = input('name of the fingerprint_1: ')
+        fingerprint_name_1 = input('name of the fingerprint_1 (e.g. test1): ')
     if not fingerprint_name_2:
-        fingerprint_name_2 = input('name of the fingerprint_2: ')
+        fingerprint_name_2 = input('name of the fingerprint_2 (e.g. test2): ')
 
     logfile_fullpath = get_logfile_fullpath(fingerprint_result_dir, fingerprint_name_1, fingerprint_name_2)
     config_file_logger(logfile_fullpath)

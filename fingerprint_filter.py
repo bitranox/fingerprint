@@ -94,5 +94,5 @@ if __name__ == '__main__':
     commandline_args = get_commandline_parameters()
     main(procmon_csv=commandline_args.procmon_csv,
          fingerprint_result_dir=commandline_args.target,
-         fingerprint_file_csv=commandline_args.fingerprint_files_csv,
+         fingerprint_file_csv=commandline_args.fingerprint_file_csv,
          fingerprint_reg_csv=commandline_args.fingerprint_reg_csv)
