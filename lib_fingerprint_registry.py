@@ -106,6 +106,7 @@ class FingerPrintRegistry(object):
         """
         reg = Registry.Registry(registry_file_info.filename)
         key_root = reg.root()
+        logger.info('registry key root : {}'.format(key_root))
 
         logger.info('parsing registry {}'.format(registry_file_info.hive_name))
         self.get_registry_entry(key=key_root,
@@ -117,7 +118,14 @@ class FingerPrintRegistry(object):
                            registry_file_info:DataStructRegistryFileInfo):
 
         registry_entry = DataStructRegistryEntry()
-        registry_entry.path = registry_file_info.hive_name + key.path()[4:]        # cut away ROOT and add hive_name
+
+        # python-registry unclear: on some hives the path starts with ROOT, on some not - so just fix it here
+        key_path:str = key.path()
+        if key_path.startswith('ROOT\\'):
+            key_path = key_path[5:]
+        key_path = registry_file_info.hive_name + '\\' + key_path
+        registry_entry.path = key_path
+
         registry_entry.modified = key.timestamp()
 
         l_registry_values = list()
