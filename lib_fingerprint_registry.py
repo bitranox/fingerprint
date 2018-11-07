@@ -58,7 +58,7 @@ class FingerPrintRegistry(object):
             os.remove(registry_file_info.filename)
 
         registry_fingerprint_name = self.get_registry_fingerprint_result_filename()
-        logger.info('writing registry fingerprint to {}')
+        logger.info('writing registry fingerprint to {}'.format(registry_fingerprint_name))
         with open(registry_fingerprint_name, 'w', encoding='utf-8',newline='') as f_out:
             fieldnames = ['path', 'modified', 'value_name', 'value_type', 'value', 'change', 'value_old']
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
@@ -119,10 +119,16 @@ class FingerPrintRegistry(object):
 
         registry_entry = DataStructRegistryEntry()
 
-        # python-registry unclear: on some hives the path starts with ROOT, on some not - so just fix it here
+        # python-registry unclear: on some hives the path starts with ROOT\, on some not - so just fix it here
+        # sometimes the path starts with CMI-CreateHive{......}\ - just fix it here
         key_path:str = key.path()
-        if key_path.startswith('ROOT\\'):
-            key_path = key_path[5:]
+        if key_path.startswith('ROOT\\') or key_path.startswith('CMI-CreateHive'):
+            l_key_path = key_path.split('\\',1)
+            if len(l_key_path) > 1:                     # if key == 'ROOT\\'
+                key_path = key_path.split('\\',1)[1]
+            else:
+                key_path = ''
+
         key_path = registry_file_info.hive_name + '\\' + key_path
         registry_entry.path = key_path
 
@@ -157,7 +163,8 @@ class FingerPrintRegistry(object):
                    ('HKLM\\SOFTWARE', 'HKEY_LOCAL_MACHINE\\SOFTWARE'),
                    ('HKLM\\SYSTEM', 'HKEY_LOCAL_MACHINE\\SYSTEM'),
                    ('HKCR', 'HKEY_CLASSES_ROOT'),
-                   ('HKCU', 'HKEY_CURRENT_USER')
+                   ('HKCU', 'HKEY_CURRENT_USER'),
+                   ('HKCC', 'HKEY_CURRENT_CONFIGURATION')
                    ]
 
         l_user_hives = self.get_l_user_hives()
