@@ -130,7 +130,6 @@ class ProcmonDiff(object):
                         if dict_key_mapped not in hashed_dict:
                             hashed_dict[dict_key_mapped] = dict_data.copy()
 
-
     def get_hashed_dict_fingerprint(self, fingerprint_csv:str)->{}:
         """
         :return:

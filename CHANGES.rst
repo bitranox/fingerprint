@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0.6
+-----
+2018-11-08: map HKCR and HKU Keys to HKCU to find in procmon logs
+
+1.0.5
+-----
+2018-11-08: hashing integrated in procmon Filter
+
 1.0.4
 -----
 2018-11-07: added file hashing
