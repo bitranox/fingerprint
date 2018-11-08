@@ -22,7 +22,7 @@ Requirements
 
 following Packets will be installed / needed (when using .py files): 
 
-python-registry,
+python-registry
 
 pyinstaller (if You want to create Your own .exe Files)
 
