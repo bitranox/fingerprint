@@ -93,6 +93,7 @@ TODO
 - get the raw data for the unreadable registry keys - priority low, since those keys are not important at all
 - get rid of wired output filenames and commandline parameters - I tried to make it simple, but better let the user decide the filenames himself.
 - make commandline parameter to turn file hashing off
+- make commandline parameter to not delete the hive copies
 - make it possible to just scan a subdirectory for changes on files
 - put a comment field into the database, and keep the change field simple for easy sorting - ADDED, CHANGED, DELETED should be enough
 - tests
