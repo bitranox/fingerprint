@@ -110,7 +110,7 @@ class ProcmonDiff(object):
         fingerprint_reg_filtered_fullpath:str = self.get_fingerprint_reg_filtered_fullpath()
 
         with open(fingerprint_files_filtered_fullpath, newline='', encoding='utf-8', mode='w') as fingerprint_files_filtered_output_file:
-            ls_fields = ['path', 'size', 'created', 'modified', 'accessed', 'status', 'change']
+            ls_fields = ['path', 'size', 'created', 'modified', 'accessed', 'status', 'hash', 'change']
             fingerprint_files_filtered_output_writer = csv.DictWriter(fingerprint_files_filtered_output_file, dialect='excel', fieldnames=ls_fields)
             fingerprint_files_filtered_output_writer.writeheader()
 
