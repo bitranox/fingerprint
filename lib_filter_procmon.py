@@ -44,6 +44,93 @@ class ProcmonDiff(object):
         self.create_filtered_procmon_csv(hashed_dict_files=hashed_dict_files, hashed_dict_reg=hashed_dict_reg)
         self.create_filtered_fingerprints(hashed_dict_files=hashed_dict_files, hashed_dict_reg=hashed_dict_reg)
 
+    @staticmethod
+    def is_registry_dict(dict_data:{})->bool:
+        if 'value_name' in dict_data:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def add_map_hkcr_to_hkcu_software_classes(dict_key:str, hashed_dict:{}, dict_data:{}):
+        # https://docs.microsoft.com/en-us/windows/desktop/sysinfo/hkey-classes-root-key
+        if dict_key.startswith('HKCR\\'):
+            dict_key_mapped = 'HKCU\\Software\\Classes' + dict_key.split('_Classes',1)[1]
+            if dict_key_mapped not in hashed_dict:
+                hashed_dict[dict_key_mapped] = dict_data.copy()
+
+    @staticmethod
+    def add_map_hku_to_hkcu(dict_key:str, hashed_dict:{}, dict_data:{}):
+        """
+        :param dict_key:
+        :param hashed_dict:
+        :param dict_data:
+        :return:
+
+        >>> hashed_dict={}
+        >>> procmon_diff = ProcmonDiff(fingerprint_result_dir='c:/fingerprint', procmon_csv='procmon-logfile.CSV', fingerprint_reg_csv='test_registry.csv', fingerprint_file_csv='test_c_files.csv')
+        >>> dict_key = "HKU\"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {}
+        >>> dict_key = "HKU\.DEFAULT"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {}
+        >>> dict_key = "HKU\.DEFAULT\SYSTEM"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {'HKCU\\\\SYSTEM': {'test': 'test'}}
+        >>> hashed_dict={}
+        >>> dict_key = "HKU\S-1-5-18\Control Panel\Accessibility\SoundSentry"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {'HKCU\\\\Control Panel\\\\Accessibility\\\\SoundSentry': {'test': 'test'}}
+        >>> hashed_dict={}
+        >>> dict_key = "HKU\S-1-5-19\Console"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {'HKCU\\\\Console': {'test': 'test'}}
+
+        >>> hashed_dict={}
+        >>> dict_key = "HKU\S-1-5-18\"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {}
+        >>> hashed_dict={}
+        >>> dict_key = "HKU\S-1-5-21-1580759954-1968686491-2999850105-1000\Software\Microsoft\Windows\CurrentVersion\Internet Settings\5.0\LowCache\Extensible Cache\PrivacIE:"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {'HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Internet Settings\\x05.0\\\\LowCache\\\\Extensible Cache\\\\PrivacIE:': {'test': 'test'}}
+
+        >>> hashed_dict={}
+        >>> dict_key = "HKU\S-1-5-21-1580759954-1968686491-2999850105-1000_Classes\S-1-5-21-1580759954-1968686491-2999850105-1000_Classes\Wow6432Node"
+        >>> procmon_diff.add_map_hku_to_hkcu(dict_key=dict_key, hashed_dict=hashed_dict, dict_data={'test':'test'} )
+        >>> hashed_dict
+        {'HKCU\\\\Software\\\\Classes\\\\Wow6432Node': {'test': 'test'}}
+
+        """
+        if dict_key.startswith('HKU\\'):
+            if dict_key.startswith('HKU\\.DEFAULT'):    # MAP HKU\\.DEFAULT\\* --> HKCU\\*
+                l_key_parts = dict_key.split('\\.DEFAULT',1)
+                if l_key_parts[1]:
+                    dict_key_mapped = 'HKCU' + dict_key.split('\\.DEFAULT')[1]
+                    if dict_key_mapped not in hashed_dict:
+                        hashed_dict[dict_key_mapped] = dict_data.copy()
+            else:
+                l_key_parts:[str] = [key_part for key_part in dict_key.split('\\',3) if key_part]
+                if l_key_parts[1].endswith('_Classes'):
+                    if len(l_key_parts) > 3:
+                        dict_key_mapped = 'HKCU\\Software\\Classes\\' + l_key_parts[3]
+                        if dict_key_mapped not in hashed_dict:
+                            hashed_dict[dict_key_mapped] = dict_data.copy()
+                else:
+                    if len(l_key_parts) > 2:
+                        dict_key_mapped = '\\'.join(['HKCU'] + l_key_parts[2:])
+                        if dict_key_mapped not in hashed_dict:
+                            hashed_dict[dict_key_mapped] = dict_data.copy()
+
+
     def get_hashed_dict_fingerprint(self, fingerprint_csv:str)->{}:
         """
         :return:
@@ -62,14 +149,17 @@ class ProcmonDiff(object):
         with open(fingerprint_reg_fullpath, newline='', encoding='utf-8-sig') as csvfile:
             csv_reader = csv.DictReader(csvfile, dialect='excel')
             for dict_data in csv_reader:
-                if 'value_name' in dict_data:
+                if self.is_registry_dict(dict_data):
                     if dict_data['value_name']:  # avoid trailing '\\'
                         dict_key:str = '\\'.join([dict_data['path'], dict_data['value_name']])
                     else:
                         dict_key: str = dict_data['path']
+                    self.add_map_hkcr_to_hkcu_software_classes(dict_key, hashed_dict, dict_data)    # add to dict entry with HKCR\... mapped to HKCU\\Software\\Classes
+                    self.add_map_hku_to_hkcu(dict_key, hashed_dict, dict_data)  # add to dict entry with HKU\... mapped to HKCU\\.. or HKCU\\Software\\Classes\\...
                 else:
                     dict_key: str = dict_data['path']
-                hashed_dict[dict_key] = dict_data.copy()
+                if dict_key not in hashed_dict:
+                    hashed_dict[dict_key] = dict_data.copy()
         return hashed_dict
 
     def get_set_paths_procmon_accessed(self)->set:
@@ -83,9 +173,9 @@ class ProcmonDiff(object):
 
     def create_filtered_procmon_csv(self, hashed_dict_reg:{}, hashed_dict_files:{}):
         """
-        >>> procmon_diff = ProcmonDiff(fingerprint_result_dir='c:/fingerprint', procmon_csv='procmon-logfile.CSV', fingerprint_reg_name='test_registry.csv', fingerprint_files_name='test_c_files.csv')
-        >>> hashed_dict_reg = procmon_diff.get_hashed_dict_fingerprint(fingerprint_csv=self.fingerprint_reg_csv)
-        >>> hashed_dict_files = procmon_diff.get_hashed_dict_fingerprint(fingerprint_csv=self.fingerprint_file_csv)
+        >>> procmon_diff = ProcmonDiff(fingerprint_result_dir='c:/fingerprint', procmon_csv='procmon-logfile.CSV', fingerprint_reg_csv='test_registry.csv', fingerprint_file_csv='test_c_files.csv')
+        >>> hashed_dict_reg = procmon_diff.get_hashed_dict_fingerprint(fingerprint_csv='test_registry.csv')
+        >>> hashed_dict_files = procmon_diff.get_hashed_dict_fingerprint(fingerprint_csv='test_c_files.csv')
         >>> procmon_diff.create_filtered_procmon_csv(hashed_dict_reg=hashed_dict_reg, hashed_dict_files=hashed_dict_files)
 
         """
