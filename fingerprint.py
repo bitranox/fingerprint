@@ -58,7 +58,7 @@ def main(fingerprint_name:str,
     :param field_length_limit:          data from registry, default set to maximum length of a cell in excel (32767) - we can support much longer fields
     :return:
 
-    >>> main(fingerprint_name='test', fp_drive_path='c:/', fingerprint_result_dir='c:/test')
+    >>> main(fingerprint_name='test', fp_files_dir='c:/', fingerprint_result_dir='c:/test')
 
     """
 
@@ -80,8 +80,8 @@ def main(fingerprint_name:str,
 
     with FingerPrintFiles(fingerprint_name=fingerprint_name,
                           fingerprint_result_dir=fingerprint_result_dir,
-                          fp_drive_path=fingerprint_drive) as fingerprint_files:
-        fingerprint_files.create_fingerprint_files()
+                          fp_files_dir=fingerprint_drive) as fingerprint_files:
+        fingerprint_files.create_fp()
 
     with FingerPrintRegistry(fingerprint_name=fingerprint_name,
                              fingerprint_result_dir=fingerprint_result_dir,

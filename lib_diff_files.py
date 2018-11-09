@@ -23,10 +23,10 @@ class FileDiff(object):
         self.fingerprint_drive = fingerprint_drive
         self.fingerprint_files_1 = FingerPrintFiles(fingerprint_name=fingerprint_name_1,
                                                     fingerprint_result_dir=fingerprint_result_dir,
-                                                    fp_drive_path=fingerprint_drive)
+                                                    fp_files_dir=fingerprint_drive)
         self.fingerprint_files_2 = FingerPrintFiles(fingerprint_name=fingerprint_name_2,
                                                     fingerprint_result_dir=fingerprint_result_dir,
-                                                    fp_drive_path=fingerprint_drive)
+                                                    fp_files_dir=fingerprint_drive)
 
     def __enter__(self):
         return self
@@ -37,7 +37,7 @@ class FileDiff(object):
     def create_diff_file(self):
         """
         :return:
-        >>> file_diff = FileDiff(fingerprint_name_1='test', fingerprint_name_2='test', fingerprint_result_dir='c:/test', fp_drive_path='c:/')
+        >>> file_diff = FileDiff(fingerprint_name_1='test', fingerprint_name_2='test', fingerprint_result_dir='c:/test', fp_files_dir='c:/')
         >>> file_diff.create_diff_file()
 
 
@@ -50,7 +50,7 @@ class FileDiff(object):
         """
         :return:
 
-        >>> file_diff = FileDiff(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_result_dir='c:/test', fp_drive_path='c:/')
+        >>> file_diff = FileDiff(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_result_dir='c:/test', fp_files_dir='c:/')
         >>> hashed_dict = file_diff.read_file_fingerprint_1()
         >>> hashed_dict['c:/'] # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         OrderedDict([('path', 'c:/'), ('size', '...'), ('created', '...'), ('modified', '...'), ('accessed', '...'), ('status', ''), ('change', '')])
@@ -131,7 +131,7 @@ class FileDiff(object):
 
     def get_diff_result_filename(self)->str:
         """
-        >>> file_diff=FileDiff(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_result_dir='c:/test', fp_drive_path='c:/' )
+        >>> file_diff=FileDiff(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_result_dir='c:/test', fp_files_dir='c:/' )
         >>> file_diff.get_diff_result_filename()
         'c:/test/diff_test_test2_c_files.csv'
         """
