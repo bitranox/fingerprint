@@ -32,7 +32,6 @@ def get_logfile_fullpath(fp_result_filename:str)->str:
     logfile_fullpath = fp_result_filename.rsplit('.',1)[0] + '.log'
     return logfile_fullpath
 
-
 def main(fp_files_dir:str, fp_result_filename:str):
     """
     >>> import test
@@ -41,18 +40,13 @@ def main(fp_files_dir:str, fp_result_filename:str):
     >>> main(fp_files_dir='./testfiles/', fp_result_filename='./testresults/fp_files_result1.csv')
     >>> test.modify_testfiles_fingerprint_2(timestamp)
     >>> main(fp_files_dir='./testfiles/', fp_result_filename='./testresults/fp_files_result2.csv')
-
     """
-
     config_console_logger()
     exit_if_not_run_as_admin()
     logger.info('create files fingerprint')
 
-    if not fp_files_dir:
-        fingerprint_name = input('directory to fingerprint (e.g. c:\\test\\ ): ')
-
-    if not fp_result_filename:
-        fp_result_filename = input('result filename (e.g. c:\\results\\fingerprint1.csv ): ')
+    fp_files_dir = check_fp_files_dir(fp_files_dir)
+    fp_result_filename = check_fp_result_filename(fp_result_filename)
 
     logger.info('fingerprinting directory : {}'.format(fp_files_dir))
     logger.info('results filename         : {}'.format(fp_result_filename))
@@ -69,6 +63,36 @@ def main(fp_files_dir:str, fp_result_filename:str):
     logger.info('Finished\n\n')
     logger_flush_all_handlers()
     input('enter for exit, check the logfile')
+
+def check_fp_result_filename(fp_result_filename:str)->str:
+    while True:
+        if not fp_result_filename:
+            fp_result_filename = input('result filename (e.g. c:\\results\\fingerprint1.csv ): ')
+        if is_fp_result_filename_ok(fp_result_filename):
+            break
+        else:
+            logger.info('result filename not writable, try again')
+            logger_flush_all_handlers()
+    return fp_result_filename
+
+def check_fp_files_dir(fp_files_dir:str)->str:
+    while True:
+        if not fp_files_dir:
+            fp_files_dir = input('directory to fingerprint (e.g. c:\\test\\ ): ')
+        if is_fp_files_dir_ok(fp_files_dir):
+            break
+        else:
+            logger.info('directory does not exist, try again')
+            logger_flush_all_handlers()
+    return fp_files_dir
+
+def is_fp_files_dir_ok(fp_files_dir)->bool:
+    # TODO
+    return True
+
+def is_fp_result_filename_ok(fp_result_filename)->bool:
+    # TODO
+    return True
 
 
 if __name__ == '__main__':
