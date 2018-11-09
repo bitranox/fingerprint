@@ -59,7 +59,7 @@ def main(fingerprint_name_1:str,
 
     :return:
 
-    >>> main(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_drive='c:/', fingerprint_result_dir='c:/test')
+    >>> main(fingerprint_name_1='test', fingerprint_name_2='test2', fp_drive_path='c:/', fingerprint_result_dir='c:/test')
 
     """
     config_console_logger()

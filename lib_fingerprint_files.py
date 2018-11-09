@@ -5,12 +5,10 @@ from lib_helper_functions import *
 from lib_hash import get_file_hash
 
 class FingerPrintFiles(object):
-    def __init__(self, fingerprint_name:str, fingerprint_result_dir:str, fingerprint_drive:str):
-        self.fingerprint_name = fingerprint_name
-        self.fingerprint_result_dir = fingerprint_result_dir
-        self.fingerprint_drive = fingerprint_drive
-        if not os.path.isdir(self.fingerprint_result_dir):
-            os.makedirs(self.fingerprint_result_dir, exist_ok=True)
+    def __init__(self, fp_drive_path:str, fp_result_fullpath:str):
+        self.fp_result_fullpath:str = fp_result_fullpath
+        self.fp_drive_path = self.format_fp_drive_path(fp_drive_path)
+        self.create_fp_result_dir()
 
     def __enter__(self):
         return self
@@ -20,18 +18,17 @@ class FingerPrintFiles(object):
 
     def create_fingerprint_files(self):
         """
-        >>> fingerprint=FingerPrintFiles(fingerprint_name='test', fingerprint_result_dir='c:/test', fingerprint_drive='c:/' )
+        >>> fingerprint=FingerPrintFiles(fp_drive_path='c:/', fp_result_fullpath='c:/fingerprint/fp_files_c.csv')
         >>> fingerprint.create_fingerprint_files()
 
         """
 
-        logger.info('create fingerprint for files on drive {}'.format(self.fingerprint_drive))
+        logger.info('create fingerprint for files from {}, storing results in {}'.format(self.fp_drive_path, self.fp_result_fullpath))
         n_files:int = 0
         file_iterator = self.get_file_iterator()
-        file_fingerprint_name = self.get_file_fingerprint_result_filename()
-        with open(file_fingerprint_name, 'w', encoding='utf-8',newline='') as f_out:
+        with open(self.fp_result_fullpath, 'w', encoding='utf-8',newline='') as f_out:
 
-            fieldnames = ['path', 'size', 'created', 'modified', 'accessed', 'status','hash','change']
+            fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
             csv_writer.writeheader()
 
@@ -45,22 +42,24 @@ class FingerPrintFiles(object):
     @staticmethod
     def get_fileinfo(filename:str)->DataStructFileInfo:
         """
-        >>> fingerprint=FingerPrintFiles(fingerprint_name='test', fingerprint_result_dir='c:/test', fingerprint_drive='c:/' )
-        >>> fingerprint.get_fileinfo('c:/pagefile.sys') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        <filesnapshot.DataStructFileInfo object at ...>
-        >>> fileinfo = fingerprint.get_fileinfo('c:/does-not-exist.txt') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> fingerprint=FingerPrintFiles(fp_drive_path='c:/', fp_result_fullpath='c:/fingerprint/fp_files_c.csv')
+        >>> fileinfo = fingerprint.get_fileinfo('c:/pagefile.sys') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         >>> fileinfo.path
-        'c:/does-not-exist.txt'
-        >>> fileinfo.status
-        'vanished / not found'
+        'c:/pagefile.sys'
+        >>> fileinfo.hash
+        ''
+        >>> fileinfo.remark
+        'access denied'
+        >>> fileinfo = fingerprint.get_fileinfo('c:/does-not-exist.txt') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> fileinfo is None
+        True
         """
 
-        dict_attribute_functions = {'set_accessed':os.path.getatime, 'set_modified':os.path.getmtime,
-                                    'set_created':os.path.getctime,'size':os.path.getsize}
+        dict_attribute_functions = {'accessed_float':os.path.getatime, 'modified_float':os.path.getmtime,
+                                    'created_float':os.path.getctime,'size':os.path.getsize, 'hash':get_file_hash}
 
         fileinfo = DataStructFileInfo()
         fileinfo.path = filename
-        fileinfo.hash = get_file_hash(filename)
 
         for attribute,file_property_function in dict_attribute_functions.items():
             try:
@@ -68,22 +67,47 @@ class FingerPrintFiles(object):
             except FileNotFoundError:
                 fileinfo = None
             except OSError:
-                fileinfo.status = 'access denied'
+                fileinfo.remark = 'access denied'
         return fileinfo
 
-    def get_file_fingerprint_result_filename(self)->str:
-        """
-        >>> fingerprint=FingerPrintFiles(fingerprint_name='test', fingerprint_result_dir='c:/test', fingerprint_drive='c:/' )
-        >>> fingerprint.get_file_fingerprint_result_filename()
-        'c:/test/test_c_files.csv'
-        """
-        drive_short = self.fingerprint_drive.split(':')[0]
-        file_snapshot_name = convert_path_to_posix(
-            os.path.join(self.fingerprint_result_dir, (self.fingerprint_name + '_{}_files.csv'.format(drive_short))))
-        return file_snapshot_name
-
     def get_file_iterator(self):
-        fingerprint_drive = self.fingerprint_drive.split(':')[0].upper()
-        glob_filter = fingerprint_drive + ':\\**'
-        ls_files = glob.iglob(glob_filter, recursive=True)
-        return ls_files
+        glob_filter = self.fp_drive_path + '**'
+        file_iter = glob.iglob(glob_filter, recursive=True)
+        return file_iter
+
+    def create_fp_result_dir(self):
+        fp_result_dir = os.path.dirname(self.fp_result_fullpath)
+        try:
+            if not os.path.isdir(fp_result_dir):
+                os.makedirs(fp_result_dir, exist_ok=True)
+        except Exception:
+            raise RuntimeError('can not create {}, probably not enough rights'.format(fp_result_dir))
+
+    @staticmethod
+    def format_fp_drive_path(fp_drive_path:str)->str:
+        """
+        >>> fingerprint=FingerPrintFiles(fp_drive_path='c:/', fp_result_fullpath='c:/fingerprint/fp_files_c.csv')
+        >>> fingerprint.format_fp_drive_path(fp_drive_path='c:/')
+        'C:\\\\'
+        >>> fingerprint.format_fp_drive_path(fp_drive_path='c:/test/')
+        'C:\\\\test\\\\'
+        >>> fingerprint.format_fp_drive_path(fp_drive_path='c') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+            ...
+        RuntimeError: the path to fingerprint has to end with "\\" or "/"
+
+        >>> fingerprint.format_fp_drive_path(fp_drive_path='does_not_exist/')  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+            ...
+        RuntimeError: can not find the drive to fingerprint: does_not_exist\\
+
+        """
+        fp_drive_path:str = fp_drive_path.replace('/','\\')
+        if ':' in fp_drive_path:
+            l_fp_drive_path = fp_drive_path.split(':')
+            fp_drive_path = l_fp_drive_path[0].upper() + ':' + l_fp_drive_path[1]   # upper to match with procmon logfile
+        if not fp_drive_path.endswith('\\'):
+            raise RuntimeError('the path to fingerprint has to end with "\\" or "/"')
+        if not os.path.isdir(fp_drive_path):
+            raise RuntimeError('can not find the drive to fingerprint: {}'.format(fp_drive_path))
+        return fp_drive_path

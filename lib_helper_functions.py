@@ -3,17 +3,22 @@ from datetime import datetime
 import logging
 import os
 import sys
-from time import sleep
+from time import sleep, mktime
 import traceback
 
 logger = logging.getLogger()
+
 
 def convert_path_to_posix(path:str)->str:
     posix_path = path.replace('\\','/')
     return posix_path
 
-def convert_timestamp_to_datetime(f_timestamp:float)->datetime:
-    return datetime.fromtimestamp(f_timestamp)
+def convert_float_to_datetime(time_float:float)->datetime:
+    return datetime.fromtimestamp(time_float)
+
+def convert_datetime_to_float(time_datetime:datetime)->float:
+    return mktime(time_datetime.timetuple()) + time_datetime.microsecond / 1E6
+
 
 def is_run_as_admin()->bool:
     """
