@@ -1,9 +1,10 @@
 import ctypes
-from datetime import datetime
+import datetime
+from lib_fingerprint_files import *
 import logging
 import os
 import sys
-from time import sleep, mktime
+import time
 import traceback
 
 logger = logging.getLogger()
@@ -13,11 +14,11 @@ def convert_path_to_posix(path:str)->str:
     posix_path = path.replace('\\','/')
     return posix_path
 
-def convert_float_to_datetime(time_float:float)->datetime:
-    return datetime.fromtimestamp(time_float)
+def convert_float_to_datetime(time_float:float)->datetime.datetime:
+    return datetime.datetime.fromtimestamp(time_float)
 
-def convert_datetime_to_float(time_datetime:datetime)->float:
-    return mktime(time_datetime.timetuple()) + time_datetime.microsecond / 1E6
+def convert_datetime_to_float(time_datetime:datetime.datetime)->float:
+    return time.mktime(time_datetime.timetuple()) + time_datetime.microsecond / 1E6
 
 
 def is_run_as_admin()->bool:
@@ -73,12 +74,12 @@ def logger_flush_all_handlers():
     for handler in flush_logger.handlers:
         if hasattr(handler, 'flush'):
             handler.flush()
-    sleep(0.1)
+    time.sleep(0.1)
 
 def config_console_logger():
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    datefmt = '%y-%m-%d %H:%M'
+    datefmt = '%y-%m-%d %H:%M:%S'
     formatter = logging.Formatter('[%(asctime)s] %(levelname)-8s: %(message)s', datefmt)
     console.setFormatter(formatter)
     logging.getLogger().addHandler(console)
@@ -92,7 +93,7 @@ def config_file_logger(logfile_fullpath:str):
 
         file_logger = logging.FileHandler(filename=logfile_fullpath, mode='w', encoding='utf-8')
         file_logger.setLevel(logging.DEBUG)
-        datefmt = '%y-%m-%d %H:%M'
+        datefmt = '%y-%m-%d %H:%M:%S'
         formatter = logging.Formatter('[%(asctime)s] %(levelname)-8s: %(message)s', datefmt)
         file_logger.setFormatter(formatter)
         logging.getLogger().addHandler(file_logger)

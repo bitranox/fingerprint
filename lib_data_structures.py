@@ -1,4 +1,6 @@
-from lib_helper_functions import *
+from datetime import datetime
+import time
+import lib_helper_functions
 
 class DataStructFileInfo(object):
     def __init__(self):
@@ -9,40 +11,40 @@ class DataStructFileInfo(object):
 
         >>> ### created_float, created - setters and getters
         >>> time_float = round(time.time(),6)
-        >>> time_datetime = convert_float_to_datetime(time_float)
+        >>> time_datetime = lib_helper_functions.convert_float_to_datetime(time_float)
         >>> fileinfo.created_float = time_float
         >>> time_float == fileinfo.created_float
         True
         >>> time_datetime == fileinfo.created
         True
         >>> time_float = round(time.time(),6)
-        >>> time_datetime = convert_float_to_datetime(time_float)
+        >>> time_datetime = lib_helper_functions.convert_float_to_datetime(time_float)
         >>> fileinfo.created = time_datetime
         >>> fileinfo.created_float == time_float
         True
         >>> ### modified_float, crated - setters and getters
         >>> time_float = round(time.time(),6)
-        >>> time_datetime = convert_float_to_datetime(time_float)
+        >>> time_datetime = lib_helper_functions.convert_float_to_datetime(time_float)
         >>> fileinfo.modified_float = time_float
         >>> time_float == fileinfo.modified_float
         True
         >>> time_datetime == fileinfo.modified
         True
         >>> time_float = round(time.time(),6)
-        >>> time_datetime = convert_float_to_datetime(time_float)
+        >>> time_datetime = lib_helper_functions.convert_float_to_datetime(time_float)
         >>> fileinfo.modified = time_datetime
         >>> fileinfo.modified_float == time_float
         True
         >>> ### accessed_float, accessed - setters and getters
         >>> time_float = round(time.time(),6)
-        >>> time_datetime = convert_float_to_datetime(time_float)
+        >>> time_datetime = lib_helper_functions.convert_float_to_datetime(time_float)
         >>> fileinfo.accessed_float = time_float
         >>> time_float == fileinfo.accessed_float
         True
         >>> time_datetime == fileinfo.accessed
         True
         >>> time_float = round(time.time(),6)
-        >>> time_datetime = convert_float_to_datetime(time_float)
+        >>> time_datetime = lib_helper_functions.convert_float_to_datetime(time_float)
         >>> fileinfo.accessed = time_datetime
         >>> fileinfo.accessed_float == time_float
         True
@@ -58,7 +60,7 @@ class DataStructFileInfo(object):
         self._accessed_float: float = 0.0
         self._accessed: datetime = datetime(1980, 1, 1, 0, 0, 0)
         self.hash:str = ''
-        self.change:str = ''    # ADDED, DELETED, CHANGED, SILENT_CHANGED (Data changed without updating the Filedates)
+        self.change:str = ''    # ADDED, DELETED, CHANGED, CHANGED_SILENT (Data changed without updating the Filedates)
         self.remark:str = ''
 
     @property
@@ -68,7 +70,7 @@ class DataStructFileInfo(object):
     @created_float.setter
     def created_float(self, created:float):
         self._created_float = created
-        self._created = convert_float_to_datetime(created)
+        self._created = lib_helper_functions.convert_float_to_datetime(created)
 
     @property
     def created(self)->datetime:
@@ -77,7 +79,7 @@ class DataStructFileInfo(object):
     @created.setter
     def created(self,created:datetime):
         self._created = created
-        self._created_float = convert_datetime_to_float(created)
+        self._created_float = lib_helper_functions.convert_datetime_to_float(created)
 
     @property
     def modified_float(self)->float:
@@ -86,7 +88,7 @@ class DataStructFileInfo(object):
     @modified_float.setter
     def modified_float(self, modified:float):
         self._modified_float = modified
-        self._modified = convert_float_to_datetime(modified)
+        self._modified = lib_helper_functions.convert_float_to_datetime(modified)
 
     @property
     def modified(self)->datetime:
@@ -95,7 +97,7 @@ class DataStructFileInfo(object):
     @modified.setter
     def modified(self,modified:datetime):
         self._modified = modified
-        self._modified_float = convert_datetime_to_float(modified)
+        self._modified_float = lib_helper_functions.convert_datetime_to_float(modified)
 
     @property
     def accessed_float(self)->float:
@@ -104,7 +106,7 @@ class DataStructFileInfo(object):
     @accessed_float.setter
     def accessed_float(self, accessed:float):
         self._accessed_float = accessed
-        self._accessed = convert_float_to_datetime(accessed)
+        self._accessed = lib_helper_functions.convert_float_to_datetime(accessed)
 
     @property
     def accessed(self)->datetime:
@@ -113,7 +115,7 @@ class DataStructFileInfo(object):
     @accessed.setter
     def accessed(self,accessed:datetime):
         self._accessed = accessed
-        self._accessed_float = convert_datetime_to_float(accessed)
+        self._accessed_float = lib_helper_functions.convert_datetime_to_float(accessed)
 
     def get_data_dict(self)->dict:
         """
@@ -124,9 +126,9 @@ class DataStructFileInfo(object):
         >>> time_created_float = round(time.time(),6)
         >>> time_modified_float = time_created_float +1
         >>> time_accessed_float = time_created_float +2
-        >>> time_created = convert_float_to_datetime(time_created_float)
-        >>> time_modified = convert_float_to_datetime(time_modified_float)
-        >>> time_accessed = convert_float_to_datetime(time_accessed_float)
+        >>> time_created = lib_helper_functions.convert_float_to_datetime(time_created_float)
+        >>> time_modified = lib_helper_functions.convert_float_to_datetime(time_modified_float)
+        >>> time_accessed = lib_helper_functions.convert_float_to_datetime(time_accessed_float)
         >>> fileinfo.created_float = time_created_float
         >>> fileinfo.modified_float = time_modified_float
         >>> fileinfo.accessed_float = time_accessed_float
