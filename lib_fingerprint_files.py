@@ -13,7 +13,7 @@ class FingerPrintFiles(object):
 
     def __enter__(self):
         """
-        >>> with FingerPrintFiles(fp_drive_path='./testfiles/', fp_result_fullpath='./testresults/fp_files1_result.csv') as fingerprint:
+        >>> with FingerPrintFiles(fp_drive_path='./testfiles/', fp_result_fullpath='./testresults/fp_files_result1.csv') as fingerprint:
         ...   pass
 
         """
@@ -27,10 +27,10 @@ class FingerPrintFiles(object):
         >>> import test
         >>> timestamp = time.time()
         >>> test.create_testfiles_fingerprint_1(timestamp)
-        >>> fingerprint=FingerPrintFiles(fp_drive_path='./testfiles/', fp_result_fullpath='./testresults/fp_files1_result.csv')
+        >>> fingerprint=FingerPrintFiles(fp_drive_path='./testfiles/', fp_result_fullpath='./testresults/fp_files_result1.csv')
         >>> fingerprint.create_fingerprint_files()
         >>> test.modify_testfiles_fingerprint_2(timestamp)
-        >>> fingerprint=FingerPrintFiles(fp_drive_path='./testfiles/', fp_result_fullpath='./testresults/fp_files2_result.csv')
+        >>> fingerprint=FingerPrintFiles(fp_drive_path='./testfiles/', fp_result_fullpath='./testresults/fp_files_result2.csv')
         >>> fingerprint.create_fingerprint_files()
 
         """
