@@ -121,12 +121,14 @@ def format_fp_files_dir(fp_files_dir:str)->str:
     >>> format_fp_files_dir(fp_files_dir='c')  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
-    RuntimeError: the path to fingerprint has to end with "\\" or "/"
+    RuntimeError: can not find the directory to fingerprint: c\\
 
     >>> format_fp_files_dir(fp_files_dir='does_not_exist/')  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
-    RuntimeError: can not find the drive to fingerprint: does_not_exist\\
+    RuntimeError: can not find the directory to fingerprint: does_not_exist\\
+    >>> format_fp_files_dir(fp_files_dir='./testfiles/')
+    '.\\\\testfiles\\\\'
 
     """
     fp_files_dir:str = fp_files_dir.replace('/', '\\')
@@ -134,7 +136,7 @@ def format_fp_files_dir(fp_files_dir:str)->str:
         l_fp_drive_path = fp_files_dir.split(':')
         fp_files_dir = l_fp_drive_path[0].upper() + ':' + l_fp_drive_path[1]   # upper to match with procmon logfile
     if not fp_files_dir.endswith('\\'):
-        raise RuntimeError('the path to fingerprint has to end with "\\" or "/"')
+        fp_files_dir = fp_files_dir + '\\'
     if not os.path.isdir(fp_files_dir):
-        raise RuntimeError('can not find the drive to fingerprint: {}'.format(fp_files_dir))
+        raise RuntimeError('can not find the directory to fingerprint: {}'.format(fp_files_dir))
     return fp_files_dir

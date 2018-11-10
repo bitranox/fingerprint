@@ -1,6 +1,6 @@
 import argparse
-from lib_fingerprint_files import FingerPrintFiles
-from lib_helper_functions import *
+import lib_fingerprint_files
+import lib_helper_functions
 import lib_doctest
 import logging
 import sys
@@ -41,8 +41,8 @@ def main(fp_files_dir:str, fp_result_filename:str):
     >>> test.modify_testfiles_fingerprint_2(timestamp)
     >>> main(fp_files_dir='./testfiles/', fp_result_filename='./testresults/fp_files_result2.csv')
     """
-    config_console_logger()
-    exit_if_not_run_as_admin()
+    lib_helper_functions.config_console_logger()
+    lib_helper_functions.exit_if_not_run_as_admin()
     logger.info('create files fingerprint')
 
     fp_files_dir = check_fp_files_dir(fp_files_dir)
@@ -52,45 +52,50 @@ def main(fp_files_dir:str, fp_result_filename:str):
     logger.info('results filename         : {}'.format(fp_result_filename))
 
     logfile_fullpath = get_logfile_fullpath(fp_result_filename)
-    config_file_logger(logfile_fullpath)
+    lib_helper_functions.config_file_logger(logfile_fullpath)
 
     # fp_files_dir:str, fp_result_filename:str
 
-    with FingerPrintFiles(fp_files_dir=fp_files_dir,
+    with lib_fingerprint_files.FingerPrintFiles(fp_files_dir=fp_files_dir,
                           fp_result_filename=fp_result_filename) as fingerprint_files:
         fingerprint_files.create_fp()
 
     logger.info('Finished\n\n')
-    logger_flush_all_handlers()
+    lib_helper_functions.logger_flush_all_handlers()
     input('enter for exit, check the logfile')
 
 def check_fp_result_filename(fp_result_filename:str)->str:
-    while True:
-        if not fp_result_filename:
-            fp_result_filename = input('result filename (e.g. c:\\results\\fingerprint1.csv ): ')
-        if is_fp_result_filename_ok(fp_result_filename):
-            break
+    while not is_fp_result_filename_ok(fp_result_filename):
+        fp_result_filename = input('result filename (e.g. c:\\results\\fingerprint1.csv ): ')
+        if not is_fp_result_filename_ok(fp_result_filename):
+            logger.info('can write to {}, probably access rights'.format(fp_result_filename))
         else:
-            logger.info('result filename not writable, try again')
-            logger_flush_all_handlers()
+            break
     return fp_result_filename
 
 def check_fp_files_dir(fp_files_dir:str)->str:
-    while True:
-        if not fp_files_dir:
-            fp_files_dir = input('directory to fingerprint (e.g. c:\\test\\ ): ')
-        if is_fp_files_dir_ok(fp_files_dir):
-            break
+    while not is_fp_files_dir_ok(fp_files_dir):
+        fp_files_dir = input('directory to fingerprint (e.g. c:\\test\\ ): ')
+        if not is_fp_files_dir_ok(fp_files_dir):
+            logger.info('can not read directory {}'.format(fp_files_dir))
         else:
-            logger.info('directory does not exist, try again')
-            logger_flush_all_handlers()
-    return fp_files_dir
+            break
+    return lib_fingerprint_files.format_fp_files_dir(fp_files_dir)
 
-def is_fp_files_dir_ok(fp_files_dir)->bool:
-    # TODO
-    return True
+def is_fp_files_dir_ok(fp_files_dir:str)->bool:
+    """
+    >>> is_fp_files_dir_ok('./testfiles/')
+    True
+    >>> is_fp_files_dir_ok('./not_exist/')
+    False
+    """
+    try:
+        lib_fingerprint_files.format_fp_files_dir(fp_files_dir)
+        return True
+    except Exception:
+        return False
 
-def is_fp_result_filename_ok(fp_result_filename)->bool:
+def is_fp_result_filename_ok(fp_result_filename:str)->bool:
     # TODO
     return True
 
