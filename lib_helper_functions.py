@@ -49,12 +49,14 @@ def is_run_as_admin2() -> bool:
             return False
 
 
-def exit_if_not_run_as_admin():
+def inform_if_not_run_as_admin(exit_if_not_admin:bool=False, interactive:bool=False):
     if not is_run_as_admin():
-        logger.warning('this program needs to run with elevated rights (run as Administrator)')
+        logger.warning('this program should run with elevated rights (run as Administrator)')
         logger_flush_all_handlers()
-        input('Enter to Exit')
-        exit()
+        if interactive:
+            input('Enter to Exit')
+        if exit_if_not_admin:
+            exit()
 
 def log_exception_traceback(s_error:str= '', log_level:int=logging.WARNING, log_level_traceback:int=logging.DEBUG, flush_handlers:bool=False)->str:
     s_message = s_error
@@ -100,3 +102,21 @@ def config_file_logger(logfile_fullpath:str):
 
     except Exception:
         logger.error('can not configure logfile writer - probably no permission to create directory {}'.format(logfile_dir))
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise RuntimeError('Boolean value expected.')
+
+def strip_extension(file_fullpath:str)->str:
+    """
+    >>> strip_extension('./test/test.txt')
+    './test/test'
+    """
+    file_path = os.path.dirname(file_fullpath)
+    file_base = os.path.basename(file_fullpath).rsplit('.',1)[0]
+    strip_file_fullpath = os.path.join(file_path, file_base).replace('\\','/')
+    return strip_file_fullpath

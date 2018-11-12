@@ -36,7 +36,7 @@ def get_logfile_fullpath(fingerprint_result_dir:str, fingerprint_name_1:str, fin
     >>> fingerprint_result_dir = 'c:/test'
     >>> fingerprint_name_1 = 'test'
     >>> fingerprint_name_2 = 'test2'
-    >>> get_logfile_fullpath(fingerprint_result_dir, fingerprint_name_1, fingerprint_name_2)
+    >>> set_logfile_fullpath(fingerprint_result_dir, fingerprint_name_1, fingerprint_name_2)
     'c:/test/test_test2_diff.log'
     """
     logfile_fullpath = convert_path_to_posix(os.path.join(fingerprint_result_dir, ('{}_{}_diff.log'.format(fingerprint_name_1, fingerprint_name_2))))

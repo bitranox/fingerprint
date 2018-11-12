@@ -38,7 +38,7 @@ def get_logfile_fullpath(fingerprint_result_dir:str, fingerprint_name:str)->str:
 
     >>> fingerprint_result_dir = 'c:/test'
     >>> fingerprint_name = 'test'
-    >>> get_logfile_fullpath(fingerprint_result_dir, fingerprint_name)
+    >>> set_logfile_fullpath(fingerprint_result_dir, fingerprint_name)
     'c:/test/test.log'
     """
     logfile_fullpath = convert_path_to_posix(os.path.join(fingerprint_result_dir, (fingerprint_name + '.log')))
@@ -63,7 +63,7 @@ def main(fingerprint_name:str,
     """
 
     config_console_logger()
-    exit_if_not_run_as_admin()
+    inform_if_not_run_as_admin()
     logger.info('create fingerprint')
     logger.info('fingerprinting drive : {}'.format(fingerprint_drive))
     logger.info('results directory    : {}'.format(fingerprint_result_dir))

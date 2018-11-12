@@ -1,18 +1,19 @@
 import csv
+from fp_files_conf import fp_files_conf as conf
 import glob
 import logging
 from lib_data_structures import *
 from lib_helper_functions import *
 from lib_hash import get_file_hash_preserve_access_dates
 import os
+from pathlib import Path
 
 logger = logging.getLogger()
 
 class FingerPrintFiles(object):
-    def __init__(self, fp_files_dir:str, fp_result_filename:str):
-        self.fp_result_filename:str = fp_result_filename
-        self.fp_files_dir = format_fp_files_dir(fp_files_dir)
-        self.create_fp_result_dir()
+    def __init__(self):
+        format_fp_files_dir()
+        create_check_fp_result_dir()
 
     def __enter__(self):
         """
@@ -38,10 +39,10 @@ class FingerPrintFiles(object):
 
         """
 
-        logger.info('create fingerprint for files from {}, storing results in {}'.format(self.fp_files_dir, self.fp_result_filename))
+        logger.info('create fingerprint for files from {}, storing results in {}'.format(conf.fp_files_dir, conf.fp_result_filename))
         n_files:int = 0
         file_iterator = self.get_file_iterator()
-        with open(self.fp_result_filename, 'w', encoding='utf-8', newline='') as f_out:
+        with open(conf.fp_result_filename, 'w', encoding='utf-8', newline='') as f_out:
 
             fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
@@ -93,45 +94,49 @@ class FingerPrintFiles(object):
                 fileinfo.remark = 'access denied'
         return fileinfo
 
-    def get_file_iterator(self):
-        glob_filter = self.fp_files_dir + '**'
+    @staticmethod
+    def get_file_iterator():
+        glob_filter = conf.fp_files_dir + '**'
         file_iter = glob.iglob(glob_filter, recursive=True)
         return file_iter
 
-    def create_fp_result_dir(self):
-        """
-        >>> fingerprint=FingerPrintFiles(fp_files_dir='./testfiles/', fp_result_filename='x:/testresults/fp_files_test_result.csv')  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Traceback (most recent call last):
-            ...
-        RuntimeError: can not create x:/testresults, probably not enough rights
-        """
-        fp_result_dir = os.path.dirname(self.fp_result_filename)
-        try:
-            if not os.path.isdir(fp_result_dir):
-                os.makedirs(fp_result_dir, exist_ok=True)
-        except Exception:
-            raise RuntimeError('can not create {}, probably not enough rights'.format(fp_result_dir))
 
-def format_fp_files_dir(fp_files_dir:str)->str:
+def create_check_fp_result_dir():
+    fp_result_dir = os.path.dirname(conf.fp_result_filename)
+    try:
+        if not os.path.isdir(fp_result_dir):
+            os.makedirs(fp_result_dir, exist_ok=True)
+        Path(conf.fp_result_filename).touch()
+        os.remove(conf.fp_result_filename)
+    except Exception:
+        raise RuntimeError('can not create {}, probably not enough rights'.format(fp_result_dir))
+
+def format_fp_files_dir()->str:
     """
-    >>> format_fp_files_dir(fp_files_dir='c:/')
+    >>> conf.fp_files_dir='c:/'
+    >>> format_fp_files_dir()
     'C:\\\\'
-    >>> format_fp_files_dir(fp_files_dir='c:/test/')
+    >>> conf.fp_files_dir='c:/test/'
+    >>> format_fp_files_dir()
     'C:\\\\test\\\\'
-    >>> format_fp_files_dir(fp_files_dir='c')  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> conf.fp_files_dir='c'
+    >>> format_fp_files_dir()  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
     RuntimeError: can not find the directory to fingerprint: c\\
 
-    >>> format_fp_files_dir(fp_files_dir='does_not_exist/')  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> conf.fp_files_dir='does_not_exist/'
+    >>> format_fp_files_dir()  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
     RuntimeError: can not find the directory to fingerprint: does_not_exist\\
-    >>> format_fp_files_dir(fp_files_dir='./testfiles/')
+
+    >>> conf.fp_files_dir='./testfiles/'
+    >>> format_fp_files_dir()
     '.\\\\testfiles\\\\'
 
     """
-    fp_files_dir:str = fp_files_dir.replace('/', '\\')
+    fp_files_dir:str = conf.fp_files_dir.replace('/', '\\')
     if ':' in fp_files_dir:
         l_fp_drive_path = fp_files_dir.split(':')
         fp_files_dir = l_fp_drive_path[0].upper() + ':' + l_fp_drive_path[1]   # upper to match with procmon logfile
@@ -139,4 +144,5 @@ def format_fp_files_dir(fp_files_dir:str)->str:
         fp_files_dir = fp_files_dir + '\\'
     if not os.path.isdir(fp_files_dir):
         raise RuntimeError('can not find the directory to fingerprint: {}'.format(fp_files_dir))
-    return fp_files_dir
+    conf.fp_files_dir = fp_files_dir
+    return conf.fp_files_dir

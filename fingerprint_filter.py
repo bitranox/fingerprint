@@ -33,19 +33,19 @@ def get_logfile_fullpath(fingerprint_result_dir, procmon_csv:str, fingerprint_fi
     >>> procmon_csv = 'procmon-logfile'
     >>> fingerprint_file_csv = 'test_c_files'
     >>> fingerprint_reg_csv = 'test_registry'
-    >>> get_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
+    >>> set_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
     'c:/fingerprint/PM_procmon-logfile_FPF_test_c_files_FPR_test_registry.log'
 
     >>> procmon_csv = 'procmon-logfile'
     >>> fingerprint_file_csv = 'test_c_files'
     >>> fingerprint_reg_csv = 'test_registry'
-    >>> get_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
+    >>> set_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
     'c:/fingerprint/PM_procmon-logfile_FPF_test_c_files_FPR_test_registry.log'
 
     >>> procmon_csv = 'procmon-logfile.csv'
     >>> fingerprint_file_csv = 'test_c_files.csv'
     >>> fingerprint_reg_csv = 'test_registry.csv'
-    >>> get_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
+    >>> set_logfile_fullpath(fingerprint_result_dir, procmon_csv, fingerprint_file_csv, fingerprint_reg_csv)
     'c:/fingerprint/PM_procmon-logfile_FPF_test_c_files_FPR_test_registry.log'
 
 
