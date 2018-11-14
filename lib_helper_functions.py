@@ -3,6 +3,7 @@ import datetime
 from lib_fingerprint_files import *
 import logging
 import os
+from pathlib import Path
 import sys
 import time
 import traceback
@@ -18,8 +19,13 @@ def convert_float_to_datetime(time_float:float)->datetime.datetime:
     return datetime.datetime.fromtimestamp(time_float)
 
 def convert_datetime_to_float(time_datetime:datetime.datetime)->float:
+    """
+    >>> convert_datetime_to_float("2018-11-14 19:46:58.076271")
+    1542221218.076271
+    """
+    if isinstance(time_datetime, str):
+        time_datetime = datetime.datetime.strptime(time_datetime, "%Y-%m-%d %H:%M:%S.%f")
     return time.mktime(time_datetime.timetuple()) + time_datetime.microsecond / 1E6
-
 
 def is_run_as_admin()->bool:
     """
@@ -56,7 +62,7 @@ def inform_if_not_run_as_admin(exit_if_not_admin:bool=False, interactive:bool=Fa
         if interactive:
             input('Enter to Exit')
         if exit_if_not_admin:
-            exit()
+            sys.exit(1)
 
 def log_exception_traceback(s_error:str= '', log_level:int=logging.WARNING, log_level_traceback:int=logging.DEBUG, flush_handlers:bool=False)->str:
     s_message = s_error
@@ -120,3 +126,13 @@ def strip_extension(file_fullpath:str)->str:
     file_base = os.path.basename(file_fullpath).rsplit('.',1)[0]
     strip_file_fullpath = os.path.join(file_path, file_base).replace('\\','/')
     return strip_file_fullpath
+
+def touch_file_create_directory(f_path:str)->bool:
+    f_dir = os.path.dirname(f_path)
+    try:
+        if not os.path.isdir(f_dir):
+            os.makedirs(f_dir, exist_ok=True)
+        Path(f_path).touch()
+        return True
+    except Exception:
+        raise RuntimeError('can not create {}, probably not enough rights'.format(f_path))

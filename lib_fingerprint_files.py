@@ -61,7 +61,7 @@ class FingerPrintFiles(object):
 
             for file in file_iterator:
                 fileinfo = get_fileinfo(filename=file,hash_files=conf.hash_files)
-                if fileinfo:
+                if fileinfo is not None:
                     n_files += 1
                     csv_writer.writerow(fileinfo.get_data_dict())
         logger.info('{} files fingerprinted'.format(n_files))
@@ -93,14 +93,13 @@ class FingerPrintFiles(object):
         with open(conf.fp_result_filename, 'w', encoding='utf-8', newline='') as f_out:
             fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
-
             csv_writer.writeheader()
 
             with concurrent.futures.ProcessPoolExecutor(max_workers=int(os.cpu_count()-1)) as executor:
                 fileinfo_futures = [executor.submit(get_fileinfo,filename=filename,hash_files=conf.hash_files) for filename in file_iterator]
                 for fileinfo_future in concurrent.futures.as_completed(fileinfo_futures):
                     fileinfo = fileinfo_future.result()
-                    if fileinfo:
+                    if fileinfo is not None:
                         n_files += 1
                         csv_writer.writerow(fileinfo.get_data_dict())
         logger.info('{} files fingerprinted'.format(n_files))
@@ -192,6 +191,13 @@ def format_fp_files_dir()->str:
     Traceback (most recent call last):
     ...
     RuntimeError: no directory to fingerprint
+
+    >>> conf.fp_files_dir='./not_exist/'
+    >>> format_fp_files_dir() # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    RuntimeError: can not find the directory to fingerprint: .\\not_exist\\
+
 
     """
     if not conf.fp_files_dir:

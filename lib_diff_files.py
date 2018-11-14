@@ -1,32 +1,10 @@
 import csv
 from lib_data_structures import *
-from lib_fingerprint_files import FingerPrintFiles
+from fp_files_diff_conf import fp_files_diff_conf as conf
 
 class FileDiff(object):
-    def __init__(self,
-                 fingerprint_name_1:str,
-                 fingerprint_name_2:str,
-                 fingerprint_result_dir:str,
-                 fingerprint_drive:str):
-
-        """
-        :param fingerprint_name_1:          the name of the fingerprint1, e.g. 'before_install'
-        :param fingerprint_name_2:          the name of the fingerprint2, e.g. 'after_install'
-        :param fingerprint_result_dir:      the result dir, e.g. 'c:/test'
-        :param fingerprint_drive:           Fingerprint Drive, for instance 'c:/'
-
-        """
-
-        self.fingerprint_name_1 = fingerprint_name_1
-        self.fingerprint_name_2 = fingerprint_name_2
-        self.fingerprint_result_dir = fingerprint_result_dir
-        self.fingerprint_drive = fingerprint_drive
-        self.fingerprint_files_1 = FingerPrintFiles(fingerprint_name=fingerprint_name_1,
-                                                    fingerprint_result_dir=fingerprint_result_dir,
-                                                    fp_files_dir=fingerprint_drive)
-        self.fingerprint_files_2 = FingerPrintFiles(fingerprint_name=fingerprint_name_2,
-                                                    fingerprint_result_dir=fingerprint_result_dir,
-                                                    fp_files_dir=fingerprint_drive)
+    def __init__(self):
+        pass
 
     def __enter__(self):
         return self
@@ -36,81 +14,81 @@ class FileDiff(object):
 
     def create_diff_file(self):
         """
-        :return:
-        >>> file_diff = FileDiff(fingerprint_name_1='test', fingerprint_name_2='test', fingerprint_result_dir='c:/test', fp_files_dir='c:/')
+        >>> conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
+        >>> conf.fp2_path = './testfiles_source/fp_files_result2_difftest.csv'
+        >>> conf.fp_result_filename = './testresults/fp_files_diff_1_2.csv'
+        >>> file_diff = FileDiff()
         >>> file_diff.create_diff_file()
 
-
         """
 
-        l_fileinfo = self.get_l_diff_fileinfo()
+        l_fileinfo:[DataStructFileInfo] = self.get_l_diff_fileinfo()
         self.write_diff_csv_file(l_fileinfo=l_fileinfo)
 
-    def read_file_fingerprint_1(self)->{}:
-        """
-        :return:
-
-        >>> file_diff = FileDiff(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_result_dir='c:/test', fp_files_dir='c:/')
-        >>> hashed_dict = file_diff.read_file_fingerprint_1()
-        >>> hashed_dict['c:/'] # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        OrderedDict([('path', 'c:/'), ('size', '...'), ('created', '...'), ('modified', '...'), ('accessed', '...'), ('status', ''), ('change', '')])
-        """
-        fingerprint_filename_1:str = self.fingerprint_files_1.get_file_fingerprint_result_filename()
-        hashed_dict = dict()
-        with open(fingerprint_filename_1, newline='', encoding='utf-8-sig') as csvfile:
-            csv_reader = csv.DictReader(csvfile, dialect='excel')
-            for dict_data in csv_reader:
-                hashed_dict[dict_data['path']] = dict_data.copy()
-        return hashed_dict
-
     def get_l_diff_fileinfo(self)->[DataStructFileInfo]:
-        hashed_dict_fingerprint_1 = self.read_file_fingerprint_1()
-        fingerprint_result_filename_2 = self.fingerprint_files_2.get_file_fingerprint_result_filename()
+
+        hashed_dict_fp_1 = get_hashed_dict_fp_1()
+
         l_fileinfo:[DataStructFileInfo] = list()
 
-        with open(fingerprint_result_filename_2, newline='', encoding='utf-8-sig') as csv_result_filename_2:
-            csv_reader_result_2 = csv.DictReader(csv_result_filename_2, dialect='excel')
+        with open(conf.fp2_path, newline='', encoding='utf-8-sig') as csv_fp_2:
+            csv_reader_fp_2 = csv.DictReader(csv_fp_2, dialect='excel')
             # iterate new file fingerprints
-            for dict_data_result_2 in csv_reader_result_2:
+            for dict_data_fp_2 in csv_reader_fp_2:
                 # if new fingerprint
-                if dict_data_result_2['path'] in hashed_dict_fingerprint_1:     # file was there before
+                if dict_data_fp_2['path'] in hashed_dict_fp_1:     # file was there before
                     # if size or modified timestamp has been changed
-                    dict_data_result_1 = hashed_dict_fingerprint_1[dict_data_result_2['path']]
+                    fileinfo_fp_2 = self.get_fileinfo_from_dict(dict_data_fp_2)
+                    fileinfo_fp_1 = self.get_fileinfo_from_dict(hashed_dict_fp_1[fileinfo_fp_2.path])
+                    fileinfo_fp_diff:DataStructFileInfo = self.get_fileinfo_from_dict(dict_data_fp_2)
 
-                    l_changed:[str] = list()
-                    if dict_data_result_1['size'] != dict_data_result_2['size']:
-                        l_changed.append('Size changed from {} to {}'.format(dict_data_result_1['size'],dict_data_result_2['size']))
-                    if dict_data_result_1['created'] != dict_data_result_2['created']:
-                        l_changed.append('Created changed from {} to {}'.format(dict_data_result_1['created'], dict_data_result_2['created']))
-                    if dict_data_result_1['modified'] != dict_data_result_2['modified']:
-                        l_changed.append('Modified changed from {} to {}'.format(dict_data_result_1['modified'], dict_data_result_2['modified']))
-                    if dict_data_result_1['hash'] != dict_data_result_2['hash']:
-                        l_changed.append('Hash (Content) changed')
+                    b_changed:bool = False
+                    b_changed_silent:bool = True
+                    remark:str = ''
+                    l_remark:[str] = list()
 
-                    if l_changed:
-                        fileinfo = self.get_fileinfo_from_dict(dict_data_result_2)
-                        fileinfo.change = ', '.join(l_changed)
-                        l_fileinfo.append(fileinfo)
+                    if fileinfo_fp_1.size != fileinfo_fp_2.size:
+                        l_remark.append('Size changed from {} to {}'.format(fileinfo_fp_1.size, fileinfo_fp_2.size))
+                        b_changed = True
+                    if fileinfo_fp_1.created != fileinfo_fp_2.created:
+                        l_remark.append('created changed from {} to {}'.format(fileinfo_fp_1.created, fileinfo_fp_2.created))
+                        b_changed = True
+                        b_changed_silent = False
+                    if fileinfo_fp_1.modified != fileinfo_fp_2.modified:
+                        l_remark.append('modified changed from {} to {}'.format(fileinfo_fp_1.modified, fileinfo_fp_2.modified))
+                        b_changed = True
+                        b_changed_silent = False
+                    if fileinfo_fp_1.hash != fileinfo_fp_2.hash:
+                        l_remark.append('hash (data) changed')
+                        b_changed = True
 
-                    # delete the file from hashed_dict_fingerprint_1
-                    hashed_dict_fingerprint_1.pop(dict_data_result_2['path'])
+                    if b_changed_silent:
+                        fileinfo_fp_diff.change = 'CHANGED_SILENT'
+                    elif b_changed:
+                        fileinfo_fp_diff.change = 'CHANGED'
+                    if l_remark:
+                        fileinfo_fp_diff.remark = ', '.join(l_remark)
+                        l_fileinfo.append(fileinfo_fp_diff)
+
+                    # delete the file from hashed_dict_fp_1
+                    hashed_dict_fp_1.pop(dict_data_fp_2['path'])
                 else:                                                                           # new file
                     # add the new file to the result list
-                    fileinfo = self.get_fileinfo_from_dict(dict_data_result_2)
-                    fileinfo.change = 'ADDED'
-                    l_fileinfo.append(fileinfo)
+                    fileinfo_fp_diff = self.get_fileinfo_from_dict(dict_data_fp_2)
+                    fileinfo_fp_diff.change = 'ADDED'
+                    l_fileinfo.append(fileinfo_fp_diff)
 
             # add the deleted files from fingerprint_1
-            l_fileinfo = l_fileinfo + self.get_l_deleted_file_info(hashed_dict_fingerprint_1)
+            l_fileinfo = l_fileinfo + self.get_l_deleted_file_info(hashed_dict_fp_1)
         return l_fileinfo
 
-    def get_l_deleted_file_info(self,hashed_dict_fingerprint_result_filename_1)->[DataStructFileInfo]:
+    def get_l_deleted_file_info(self, hashed_dict_fp_1)->[DataStructFileInfo]:
         l_fileinfo:[DataStructFileInfo] = list()
         # remaining Files were deleted
-        for path, dict_file_info in hashed_dict_fingerprint_result_filename_1.items():
-            fileinfo = self.get_fileinfo_from_dict(dict_file_info)
-            fileinfo.change = 'DELETED'
-            l_fileinfo.append(fileinfo)
+        for path, dict_file_info in hashed_dict_fp_1.items():
+            fileinfo_fp_diff = self.get_fileinfo_from_dict(dict_file_info)
+            fileinfo_fp_diff.change = 'DELETED'
+            l_fileinfo.append(fileinfo_fp_diff)
         return l_fileinfo
 
     @staticmethod
@@ -121,23 +99,25 @@ class FileDiff(object):
         return fileinfo
 
     def write_diff_csv_file(self, l_fileinfo:[DataStructFileInfo]):
-        diff_result_filename = self.get_diff_result_filename()
-        with open(diff_result_filename, 'w', encoding='utf-8',newline='') as f_out:
-            fieldnames = ['path', 'size', 'created', 'modified', 'accessed', 'status','hash','change']
+        with open(conf.fp_result_filename, 'w', encoding='utf-8',newline='') as f_out:
+            fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames)
             csv_writer.writeheader()
             for fileinfo in l_fileinfo:
                 csv_writer.writerow(fileinfo.get_data_dict())
 
-    def get_diff_result_filename(self)->str:
-        """
-        >>> file_diff=FileDiff(fingerprint_name_1='test', fingerprint_name_2='test2', fingerprint_result_dir='c:/test', fp_files_dir='c:/' )
-        >>> file_diff.get_diff_result_filename()
-        'c:/test/diff_test_test2_c_files.csv'
-        """
-        drive_short = self.fingerprint_drive.split(':')[0]
-        diff_result_filename = convert_path_to_posix(
-            os.path.join(self.fingerprint_result_dir, ('diff_{}_{}_{}_files.csv'.format(self.fingerprint_name_1,
-                                                                                        self.fingerprint_name_2,
-                                                                                        drive_short))))
-        return diff_result_filename
+def get_hashed_dict_fp_1()->{}:
+    """
+    :return:
+
+    >>> conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
+    >>> hashed_dict = get_hashed_dict_fp_1()
+    >>> hashed_dict  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    {'.\\\\testfiles\\\\file1_no_changes.txt': OrderedDict([...])}
+    """
+    hashed_dict = dict()
+    with open(conf.fp1_path, newline='', encoding='utf-8-sig') as csvfile:
+        csv_reader = csv.DictReader(csvfile, dialect='excel')
+        for dict_data in csv_reader:
+            hashed_dict[dict_data['path']] = dict_data.copy()
+    return hashed_dict

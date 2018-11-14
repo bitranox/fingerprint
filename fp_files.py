@@ -2,14 +2,12 @@ import argparse
 from fp_files_conf import fp_files_conf as conf
 import lib_fingerprint_files
 import lib_helper_functions
-import lib_doctest
 import logging
 import multiprocessing
 import sys
 import time
 
 logger = logging.getLogger()
-lib_doctest.setup_doctest_logger()
 
 def get_commandline_parameters():
     """
@@ -47,12 +45,14 @@ def get_commandline_parameters():
 def main():
     """
     >>> import test
+    >>> import lib_doctest
+    >>> lib_doctest.setup_doctest_logger()
     >>> timestamp = time.time()
     >>> test.create_testfiles_fingerprint_1(timestamp)
     >>> sys.argv.append('--fp_dir=./testfiles/')
     >>> sys.argv.append('--resultfile=./testresults/fp_files_result1.csv')
     >>> sys.argv.append('--batchmode')
-    >>> sys.argv.append('--not_admin')
+    >>> sys.argv.append('--no_admin')
     >>> get_commandline_parameters()
     >>> logger.level=logging.ERROR
     >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -83,13 +83,13 @@ def main():
     check_fp_files_dir()
     check_fp_result_filename()
 
+    conf.logfile_fullpath = lib_helper_functions.strip_extension(conf.fp_result_filename) + '.log'
+    lib_helper_functions.config_file_logger(logfile_fullpath=conf.logfile_fullpath)
+
     logger.info('fingerprinting directory : {}'.format(conf.fp_files_dir))
     logger.info('results filename         : {}'.format(conf.fp_result_filename))
     logger.info('file hashing             : {}'.format(conf.hash_files))
     logger.info('multiprocessing          : {}'.format(conf.multiprocessing))
-
-    set_logfile_fullpath()
-    lib_helper_functions.config_file_logger(logfile_fullpath=conf.logfile_fullpath)
 
     with lib_fingerprint_files.FingerPrintFiles() as fingerprint_files:
         if conf.multiprocessing:                # test c:\windows : 66 seconds
@@ -112,7 +112,7 @@ def check_fp_result_filename(test_input:str= ''):
     >>> check_fp_result_filename()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
-    SystemExit: None
+    SystemExit: 1
     >>> conf.interactive = True
     >>> check_fp_result_filename(test_input='./testresults/fp_files_result1.csv')
 
@@ -120,20 +120,20 @@ def check_fp_result_filename(test_input:str= ''):
 
     """
     conf.fp_result_filename = lib_helper_functions.strip_extension(conf.fp_result_filename) + '.csv'
-    while not is_fp_result_filename_ok():
+    while not is_fp_result_filename_ok(f_path=conf.fp_result_filename):
         if conf.interactive:
             if test_input:
                 conf.fp_result_filename = test_input
             else:
                 conf.fp_result_filename = input('result filename (e.g. c:\\results\\fingerprint1.csv ): ')
             conf.fp_result_filename = lib_helper_functions.strip_extension(conf.fp_result_filename) + '.csv'
-            if not is_fp_result_filename_ok():
+            if not is_fp_result_filename_ok(f_path=conf.fp_result_filename):
                 logger.info('can not write to {}, probably access rights'.format(conf.fp_result_filename))
             else:
                 break
         else:
             logger.info('can not write to {}, probably access rights'.format(conf.fp_result_filename))
-            exit()
+            sys.exit(1)
 
 def check_fp_files_dir(test_input:str= ''):
     """
@@ -165,7 +165,7 @@ def check_fp_files_dir(test_input:str= ''):
         else:
             logger.info('can not read directory {}'.format(conf.fp_files_dir))
             lib_helper_functions.logger_flush_all_handlers()
-            exit()
+            sys.exit(1)
 
 def is_fp_files_dir_ok()->bool:
     """
@@ -186,21 +186,18 @@ def is_fp_files_dir_ok()->bool:
     except Exception:
         return False
 
-def is_fp_result_filename_ok()->bool:
+def is_fp_result_filename_ok(f_path:str)->bool:
     """
-    >>> conf.fp_result_filename = './testresults/fp_files_result_test.csv'
-    >>> is_fp_result_filename_ok()
+    >>> is_fp_result_filename_ok(f_path='./testresults/fp_files_result_test.csv')
     True
-    >>> conf.fp_result_filename = './testresults/fp_files_result_test'
-    >>> is_fp_result_filename_ok()
+    >>> is_fp_result_filename_ok(f_path='./testresults/fp_files_result_test')
     True
-    >>> conf.fp_result_filename = 'x:/testresults/fp_files_result_test'
-    >>> is_fp_result_filename_ok()
+    >>> is_fp_result_filename_ok(f_path='x:/testresults/fp_files_result_test')
     False
     """
     # noinspection PyBroadException
     try:
-        lib_fingerprint_files.create_check_fp_result_dir()
+        lib_helper_functions.touch_file_create_directory(f_path=f_path)
         return True
     except Exception:
         return False
