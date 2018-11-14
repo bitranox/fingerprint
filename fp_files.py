@@ -13,12 +13,12 @@ lib_doctest.setup_doctest_logger()
 
 def get_commandline_parameters():
     """
-    >>> sys.argv.append('--fp_files_dir=./testfiles/')
-    >>> sys.argv.append('--fp_result_filename=./testresults/fp_files_result1.csv')
-    >>> sys.argv.append('--non_interactive')
-    >>> sys.argv.append('--continue_if_not_admin')
-    >>> sys.argv.append('--no_file_hashing')
-    >>> sys.argv.append('--no_multiprocessing')
+    >>> sys.argv.append('--fp_dir=./testfiles/')
+    >>> sys.argv.append('--resultfile=./testresults/fp_files_result1.csv')
+    >>> sys.argv.append('--batchmode')
+    >>> sys.argv.append('--not_admin')
+    >>> sys.argv.append('--no_hashing')
+    >>> sys.argv.append('--no_mp')
     >>> get_commandline_parameters()
     >>> conf.fp_files_dir
     './testfiles/'
@@ -30,44 +30,49 @@ def get_commandline_parameters():
     """
     parser = argparse.ArgumentParser(description='create fingerprint of the files under --fp_files_dir ')
     parser.add_argument('positional_ignored', type=str, nargs='*', help='Positional Arguments are ignored')
-    parser.add_argument('--fp_files_dir', type=str, required=False, default='', help='path to the directory to fingerprint, e.g. c:\\test\\')
-    parser.add_argument('--fp_result_filename', type=str, required=False, default='', help='path to the result file, e.g. c:\\results\\fp_files_result1.csv')
-    parser.add_argument('--non_interactive', dest='non_interactive', default=False, action='store_true')
-    parser.add_argument('--continue_if_not_admin', dest='continue_if_not_admin', default=False, action='store_true')
-    parser.add_argument('--no_file_hashing', dest='no_file_hashing', default=False, action='store_true')
-    parser.add_argument('--no_multiprocessing', dest='no_multiprocessing', default=False, action='store_true')
-
+    parser.add_argument('--fp_dir', type=str, required=False, default='', help='path to the directory to fingerprint, e.g. c:\\test\\')
+    parser.add_argument('--resultfile', type=str, required=False, default='', help='path to the result file, e.g. c:\\results\\fp_files_result1.csv')
+    parser.add_argument('--batchmode', dest='batchmode', default=False, action='store_true', help='no user interactions')
+    parser.add_argument('--not_admin', dest='not_admin', default=False, action='store_true', help='run with limited rights, not recommended')
+    parser.add_argument('--no_hashing', dest='no_hashing', default=False, action='store_true', help='do not calculate file hashes, not recommended')
+    parser.add_argument('--no_mp', dest='no_mp', default=False, action='store_true', help='no multiprocessing - preserves ordering of files in the result')
     args = parser.parse_args()
-    conf.fp_files_dir = args.fp_files_dir
-    conf.fp_result_filename = args.fp_result_filename
-    conf.interactive = not args.non_interactive
-    conf.exit_if_not_admin = not args.continue_if_not_admin
-    conf.hash_files = not args.no_file_hashing
-    conf.multiprocessing = not args.no_multiprocessing
+    conf.fp_files_dir = args.fp_dir
+    conf.fp_result_filename = args.resultfile
+    conf.interactive = not args.batchmode
+    conf.exit_if_not_admin = not args.not_admin
+    conf.hash_files = not args.no_hashing
+    conf.multiprocessing = not args.no_mp
 
 def main():
     """
     >>> import test
     >>> timestamp = time.time()
     >>> test.create_testfiles_fingerprint_1(timestamp)
-    >>> sys.argv.append('--fp_files_dir=./testfiles/')
-    >>> sys.argv.append('--fp_result_filename=./testresults/fp_files_result1.csv')
-    >>> sys.argv.append('--non_interactive')
-    >>> sys.argv.append('--continue_if_not_admin')
+    >>> sys.argv.append('--fp_dir=./testfiles/')
+    >>> sys.argv.append('--resultfile=./testresults/fp_files_result1.csv')
+    >>> sys.argv.append('--batchmode')
+    >>> sys.argv.append('--not_admin')
     >>> get_commandline_parameters()
     >>> logger.level=logging.ERROR
     >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
 
     >>> test.modify_testfiles_fingerprint_2(timestamp)
-    >>> sys.argv.append('--fp_result_filename=./testresults/fp_files_result2.csv')
+    >>> sys.argv.append('--resultfile=./testresults/fp_files_result2.csv')
     >>> get_commandline_parameters()
     >>> logger.level=logging.ERROR
     >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
 
-    >>> sys.argv.append('--no_multiprocessing')
+    >>> sys.argv.append('--no_mp')
     >>> get_commandline_parameters()
     >>> logger.level=logging.ERROR
     >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+
+    >>> sys.argv.append('--no_hashing')
+    >>> get_commandline_parameters()
+    >>> logger.level=logging.ERROR
+    >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+
 
     """
 
@@ -80,6 +85,8 @@ def main():
 
     logger.info('fingerprinting directory : {}'.format(conf.fp_files_dir))
     logger.info('results filename         : {}'.format(conf.fp_result_filename))
+    logger.info('file hashing             : {}'.format(conf.hash_files))
+    logger.info('multiprocessing          : {}'.format(conf.multiprocessing))
 
     set_logfile_fullpath()
     lib_helper_functions.config_file_logger(logfile_fullpath=conf.logfile_fullpath)

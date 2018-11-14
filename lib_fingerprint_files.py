@@ -49,6 +49,7 @@ class FingerPrintFiles(object):
         """
 
         logger.info('create fingerprint for files from {}, storing results in {}'.format(conf.fp_files_dir, conf.fp_result_filename))
+
         n_files:int = 0
         file_iterator = get_file_iterator()
 
@@ -59,7 +60,7 @@ class FingerPrintFiles(object):
             csv_writer.writeheader()
 
             for file in file_iterator:
-                fileinfo = get_fileinfo(file)
+                fileinfo = get_fileinfo(filename=file,hash_files=conf.hash_files)
                 if fileinfo:
                     n_files += 1
                     csv_writer.writerow(fileinfo.get_data_dict())
@@ -85,6 +86,7 @@ class FingerPrintFiles(object):
         """
 
         logger.info('create fingerprint for files from {}, storing results in {}'.format(conf.fp_files_dir, conf.fp_result_filename))
+
         n_files:int = 0
         file_iterator = get_file_iterator()
 
@@ -95,7 +97,7 @@ class FingerPrintFiles(object):
             csv_writer.writeheader()
 
             with concurrent.futures.ProcessPoolExecutor(max_workers=int(os.cpu_count()-1)) as executor:
-                fileinfo_futures = [executor.submit(get_fileinfo,filename) for filename in file_iterator]
+                fileinfo_futures = [executor.submit(get_fileinfo,filename=filename,hash_files=conf.hash_files) for filename in file_iterator]
                 for fileinfo_future in concurrent.futures.as_completed(fileinfo_futures):
                     fileinfo = fileinfo_future.result()
                     if fileinfo:
@@ -103,7 +105,7 @@ class FingerPrintFiles(object):
                         csv_writer.writerow(fileinfo.get_data_dict())
         logger.info('{} files fingerprinted'.format(n_files))
 
-def get_fileinfo(filename:str):
+def get_fileinfo(filename:str, hash_files:bool=True):   # we need to pass hash_files because state of conf.hash_files gets lost in MP
     """
     >>> import test
     >>> timestamp = time.time()
@@ -135,8 +137,10 @@ def get_fileinfo(filename:str):
 
     for attribute,file_property_function in dict_attribute_functions.items():
         try:
-            if attribute != 'hash' or conf.hash_files:
+            if attribute != 'hash':
                 setattr(fileinfo,attribute, file_property_function(filename))
+            elif hash_files:
+                setattr(fileinfo, attribute, file_property_function(filename))
         except FileNotFoundError:
             fileinfo = None
             break
