@@ -12,7 +12,7 @@ def get_commandline_parameters():
     """
     >>> sys.argv.append('--fp1=./testresults/fp_files_result1.csv')
     >>> sys.argv.append('--fp2=./testresults/fp_files_result2.csv')
-    >>> sys.argv.append('--fp_diff=./testresults/fp_files_diff_1_2.csv')
+    >>> sys.argv.append('--resultfile=./testresults/fp_files_diff_1_2.csv')
     >>> sys.argv.append('--batchmode')
     >>> get_commandline_parameters()
     >>> conf.fp1_path
@@ -24,12 +24,12 @@ def get_commandline_parameters():
     parser.add_argument('positional_ignored', type=str, nargs='*', help='Positional Arguments are ignored')
     parser.add_argument('--fp1', type=str, required=False, default='', help='path to the first fingerprint, e.g. c:\\results\\fp_files_result1.csv')
     parser.add_argument('--fp2', type=str, required=False, default='', help='path to the second fingerprint, e.g. c:\\results\\fp_files_result2.csv')
-    parser.add_argument('--fp_diff', type=str, required=False, default='', help='path to the diff file, e.g. c:\\results\\fp_files_diff_1_2.csv')
+    parser.add_argument('--resultfile', type=str, required=False, default='', help='path to the diff file, e.g. c:\\results\\fp_files_diff_1_2.csv')
     parser.add_argument('--batchmode', dest='batchmode', default=False, action='store_true', help='no user interactions')
     args = parser.parse_args()
     conf.fp1_path = args.fp1
     conf.fp2_path = args.fp2
-    conf.fp_result_filename = args.fp_diff
+    conf.fp_result_filename = args.resultfile
     conf.interactive = not args.batchmode
 
 
@@ -39,7 +39,7 @@ def main():
     >>> import lib_doctest
     >>> sys.argv.append('--fp1=./testfiles_source/fp_files_result1_difftest.csv')
     >>> sys.argv.append('--fp2=./testfiles_source/fp_files_result2_difftest.csv')
-    >>> sys.argv.append('--fp_diff=./testresults/fp_files_diff_1_2.csv')
+    >>> sys.argv.append('--resultfile=./testresults/fp_files_diff_1_2.csv')
     >>> sys.argv.append('--batchmode')
     >>> get_commandline_parameters()
     >>> logger.level=logging.ERROR
