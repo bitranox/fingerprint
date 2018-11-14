@@ -4,9 +4,7 @@ import lib_fingerprint_files
 import lib_helper_functions
 import lib_doctest
 import logging
-import os
-from pathlib import Path
-import shutil
+import multiprocessing
 import sys
 import time
 
@@ -19,6 +17,8 @@ def get_commandline_parameters():
     >>> sys.argv.append('--fp_result_filename=./testresults/fp_files_result1.csv')
     >>> sys.argv.append('--non_interactive')
     >>> sys.argv.append('--continue_if_not_admin')
+    >>> sys.argv.append('--no_file_hashing')
+    >>> sys.argv.append('--no_multiprocessing')
     >>> get_commandline_parameters()
     >>> conf.fp_files_dir
     './testfiles/'
@@ -34,11 +34,16 @@ def get_commandline_parameters():
     parser.add_argument('--fp_result_filename', type=str, required=False, default='', help='path to the result file, e.g. c:\\results\\fp_files_result1.csv')
     parser.add_argument('--non_interactive', dest='non_interactive', default=False, action='store_true')
     parser.add_argument('--continue_if_not_admin', dest='continue_if_not_admin', default=False, action='store_true')
+    parser.add_argument('--no_file_hashing', dest='no_file_hashing', default=False, action='store_true')
+    parser.add_argument('--no_multiprocessing', dest='no_multiprocessing', default=False, action='store_true')
+
     args = parser.parse_args()
     conf.fp_files_dir = args.fp_files_dir
     conf.fp_result_filename = args.fp_result_filename
     conf.interactive = not args.non_interactive
     conf.exit_if_not_admin = not args.continue_if_not_admin
+    conf.hash_files = not args.no_file_hashing
+    conf.multiprocessing = not args.no_multiprocessing
 
 def main():
     """
@@ -59,6 +64,11 @@ def main():
     >>> logger.level=logging.ERROR
     >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
 
+    >>> sys.argv.append('--no_multiprocessing')
+    >>> get_commandline_parameters()
+    >>> logger.level=logging.ERROR
+    >>> main()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+
     """
 
     lib_helper_functions.config_console_logger()
@@ -75,7 +85,10 @@ def main():
     lib_helper_functions.config_file_logger(logfile_fullpath=conf.logfile_fullpath)
 
     with lib_fingerprint_files.FingerPrintFiles() as fingerprint_files:
-        fingerprint_files.create_fp()
+        if conf.multiprocessing:                # test c:\windows : 66 seconds
+            fingerprint_files.create_fp_mp()
+        else:
+            fingerprint_files.create_fp()       # test c:\windows : 124 seconds
 
     logger.info('Finished\n\n')
     lib_helper_functions.logger_flush_all_handlers()
@@ -159,6 +172,7 @@ def is_fp_files_dir_ok()->bool:
     >>> is_fp_files_dir_ok()
     False
     """
+    # noinspection PyBroadException
     try:
         lib_fingerprint_files.format_fp_files_dir()
         return True
@@ -177,6 +191,7 @@ def is_fp_result_filename_ok()->bool:
     >>> is_fp_result_filename_ok()
     False
     """
+    # noinspection PyBroadException
     try:
         lib_fingerprint_files.create_check_fp_result_dir()
         return True
@@ -193,8 +208,9 @@ def set_logfile_fullpath():
     conf.logfile_fullpath = lib_helper_functions.strip_extension(conf.fp_result_filename) + '.log'
 
 
-
-
 if __name__ == '__main__':
+    # Hack for multiprocessing.freeze_support() to work from a
+    # setuptools-generated entry point.
+    multiprocessing.freeze_support()
     get_commandline_parameters()
     main()

@@ -5,6 +5,8 @@ class FPFilesConf(object):
         self.interactive:bool = True
         self.exit_if_not_admin:bool = True
         self.logfile_fullpath:str = ''
+        self.hash_files:bool = True
+        self.multiprocessing:bool = True
 
 
 fp_files_conf = FPFilesConf()
