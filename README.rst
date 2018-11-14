@@ -1,26 +1,37 @@
 fingerprint
 =================
+Monitoring Registry and File Changes in Windows - forensic analytics for windows registry and files
 
-Monitoring Registry and File Changes in Windows - forensic analytics for windows registry and files.
-
-I wrote this software because those I found in the wild are either too slow, undocumented, or expansive.
-
-"fingerprint" records the state of the system, by saving all filenames, file sizes, creation, access and modify dates als also a hash of the data in a csv file.
-All registry keys and values are stored in a second file. Different Fingerprints can be compared and filtered with procmon logfiles to analyze what and when the system was changed.
+"fingerprint" records the state of a windows system, in terms of files and registry.
+Such fingerprints can be compared to find all changed data.
+The data can be narrowed with procmon logfiles, in order to see which process caused the changes.
+Procmon Logfiles can be filtered to show only events for changed Files or Registry Entries.
+This makes it much more easy to find the cause of system changes.
 
 All fingerprints are stored in csv, Excel compatible format, for convenient filtering, sorting, etc.
+You can also use third party tools like "Meld", "FC", "diff" to compare fingerprints.
+
+You can use fingerprint in batchfiles to automatically filter out events of Your interest - its batch friendly
 
 sources are included, but You just might use the .exe files created with pyinstaller from `Releases <https://github.com/bitranox/fingerprint/releases>`_
 
+Usage Scenarios
+---------------
+Monitor honeypots, monitor system changes, find "hidden" registry entries or files, like expiration of demo versions,
+analyze virus activities, analyze if Your privacy was compromised. You will be able to find every Spy Program, Worm,
+or hack into Your system, unless the program ONLY resides in memory and does not alter anything - but that is very unlikely
+
+Usage
+-----
+check the `Wiki <https://github.com/bitranox/fingerprint/wiki>`_
+
 Installation
 ------------
-
 no installation required, just use the .exe files from `Releases <https://github.com/bitranox/fingerprint/releases>`_
 
 Requirements
 ---------------
-
-following Packets will be installed / needed (when using .py files): 
+following Packets will be installed / needed (when using .py files):
 
 python-registry
 
@@ -32,24 +43,18 @@ Inspired by Regshot, InstallWatch Pro, SpyMe Tools, RegDiff, WhatChanged, RegFro
 
 Contribute
 ----------
-
 I would love for you to fork and send me pull request for this project.
 Please contribute.
 
-
 License
 -------
-
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
 
 See `License file <https://github.com/bitranox/fingerprint/blob/master/LICENSE>`_
 
-
 SAMPLE SESSION
 --------------
-
-
-Lets make s walk-through by example. Lets assume we have a software with "Trial Period" and the Software stops working after the trial period. 
+Lets make s walk-through by example. Lets assume we have a software with "Trial Period" and the Software stops working after the trial period.
 
 After uninstalling and reinstalling the software, it still shows "Trial Period ended" - so this software is not completely uninstalling, leaving some files or registry entries behind.
 
@@ -91,10 +96,7 @@ TODO
 ----
 
 - get the raw data for the unreadable registry keys - priority low, since those keys are not important at all
-- get rid of wired output filenames and commandline parameters - I tried to make it simple, but better let the user decide the filenames himself.
-- make commandline parameter to turn file hashing off
 - make commandline parameter to not delete the hive copies
-- make it possible to just scan a subdirectory for changes on files
 - put a comment field into the database, and keep the change field simple for easy sorting - ADDED, CHANGED, DELETED should be enough
-- tests
+- tests, travis windows
 - refractoring
