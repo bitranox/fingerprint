@@ -78,7 +78,7 @@ def main():
 
     lib_helper_functions.config_console_logger()
     lib_helper_functions.inform_if_not_run_as_admin(exit_if_not_admin=conf.exit_if_not_admin, interactive=conf.interactive)
-    logger.info('create files fingerprint')
+    logger.info('create files fingerprint {}'.format(conf.version))
 
     check_fp_files_dir()
     check_fp_result_filename()

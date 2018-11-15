@@ -49,7 +49,7 @@ def main():
     """
 
     lib_helper_functions.config_console_logger()
-    logger.info('create file fingerprint diff')
+    logger.info('create file fingerprint diff {}'.format(conf.version))
 
     conf.fp1_path = check_fp_file(f_input_file=conf.fp1_path, file_number=1)
     conf.fp2_path = check_fp_file(f_input_file=conf.fp2_path, file_number=2)

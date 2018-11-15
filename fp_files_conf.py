@@ -7,6 +7,7 @@ class FPFilesConf(object):
         self.logfile_fullpath:str = ''
         self.hash_files:bool = True
         self.multiprocessing:bool = True
+        self.version:str = '2.0.0'
 
 
 fp_files_conf = FPFilesConf()

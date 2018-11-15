@@ -5,6 +5,6 @@ class FPFilesDiffConf(object):
         self.fp_result_filename:str = ''
         self.interactive:bool = True
         self.logfile_fullpath:str = ''
-
+        self.version:str = '2.0.0'
 
 fp_files_diff_conf = FPFilesDiffConf()

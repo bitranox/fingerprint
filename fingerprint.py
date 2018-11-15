@@ -1,3 +1,10 @@
+####################################################################################
+# DEPRICATED OLD VERSION - WILL BE SPLITTED INTO DIFFERENT FILES, WORK IN PROGRESS #
+# THIS FILE IS BROKEN !!! WORK IN PROGRESS                                         #
+# --> fp_files.py  V2.0.0 (finished)                                               #
+# --> fp_reg.py    V2.0.0 (TODO)                                                   #
+####################################################################################
+
 import argparse
 from lib_fingerprint_files import FingerPrintFiles
 from lib_fingerprint_registry import FingerPrintRegistry

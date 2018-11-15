@@ -1,3 +1,10 @@
+####################################################################################
+# DEPRICATED OLD VERSION - WILL BE SPLITTED INTO DIFFERENT FILES, WORK IN PROGRESS #
+# THIS FILE IS BROKEN !!! WORK IN PROGRESS                                         #
+# --> fp_files_diff.py V2.0.0 (finished)                                           #
+# --> fp_reg_diff.py   V2.0.0 (TODO)                                               #
+####################################################################################
+
 import argparse
 from lib_diff_files import FileDiff
 from lib_diff_registry import RegistryDiff
