@@ -10,13 +10,13 @@ logger = logging.getLogger()
 
 def get_commandline_parameters():
     """
-    >>> sys.argv.append('--fp1=./testresults/fp_files_result1.csv')
-    >>> sys.argv.append('--fp2=./testresults/fp_files_result2.csv')
+    >>> sys.argv.append('--fp1=./testfiles_source/fp_files_result1_difftest.csv')
+    >>> sys.argv.append('--fp2=./testfiles_source/fp_files_result2_difftest.csv')
     >>> sys.argv.append('--resultfile=./testresults/fp_files_diff_1_2.csv')
     >>> sys.argv.append('--batchmode')
     >>> get_commandline_parameters()
     >>> conf.fp1_path
-    './testresults/fp_files_result1.csv'
+    './testfiles_source/fp_files_result1_difftest.csv'
     >>> conf.interactive
     False
     """
@@ -106,8 +106,8 @@ def check_fp_result_filename(test_input:str= ''):
 def check_fp_file(f_input_file:str, file_number:int, test_input:str= '')->str:
     """
     >>> conf.interactive = True
-    >>> check_fp_file(f_input_file='./testfiles/', file_number=1,test_input='./testresults/fp_files_result1.csv')
-    './testresults/fp_files_result1.csv'
+    >>> check_fp_file(f_input_file='./testfiles/', file_number=1,test_input='./testfiles_source/fp_files_result1_difftest.csv')
+    './testfiles_source/fp_files_result1_difftest.csv'
 
     >>> conf.interactive = False
     >>> check_fp_file(f_input_file='./testfiles/', file_number=1)  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -116,8 +116,8 @@ def check_fp_file(f_input_file:str, file_number:int, test_input:str= '')->str:
     SystemExit: 1
 
     >>> conf.interactive = False
-    >>> check_fp_file(f_input_file='./testresults/fp_files_result1.csv', file_number=1)
-    './testresults/fp_files_result1.csv'
+    >>> check_fp_file(f_input_file='./testfiles_source/fp_files_result1_difftest.csv', file_number=1)
+    './testfiles_source/fp_files_result1_difftest.csv'
 
 
     """
@@ -146,7 +146,7 @@ def is_fp_input_file_ok(f_path:str)->bool:
     False
     >>> is_fp_input_file_ok(f_path='./not_exist/')
     False
-    >>> is_fp_input_file_ok(f_path='./testresults/fp_files_result1.csv')
+    >>> is_fp_input_file_ok(f_path='./testfiles_source/fp_files_result1_difftest.csv')
     True
 
     """
