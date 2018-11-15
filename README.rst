@@ -97,6 +97,5 @@ TODO
 
 - get the raw data for the unreadable registry keys - priority low, since those keys are not important at all
 - make commandline parameter to not delete the hive copies
-- put a comment field into the database, and keep the change field simple for easy sorting - ADDED, CHANGED, DELETED should be enough
 - tests, travis windows
 - refractoring
