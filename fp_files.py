@@ -137,6 +137,12 @@ def check_fp_result_filename(test_input:str= ''):
 
 def check_fp_files_dir(test_input:str= ''):
     """
+    >>> import test
+    >>> import lib_doctest
+    >>> lib_doctest.setup_doctest_logger()
+    >>> timestamp = time.time()
+    >>> test.create_testfiles_fingerprint_1(timestamp)
+
     >>> conf.interactive = False
     >>> conf.fp_files_dir = './testfiles/'
     >>> check_fp_files_dir()
@@ -144,7 +150,7 @@ def check_fp_files_dir(test_input:str= ''):
     >>> check_fp_files_dir()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
-    SystemExit: None
+    SystemExit: 1
     >>> conf.interactive = True
     >>> check_fp_files_dir(test_input='./testfiles/')  # +ELLIPSIS, +NORMALIZE_WHITESPACE
 
