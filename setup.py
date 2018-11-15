@@ -21,13 +21,13 @@ CLASSIFIERS = [
 dirname = os.path.dirname(__file__)
 
 long_description = (
-    codecs.open(os.path.join(dirname, 'README2.rst'), encoding='utf-8').read() + '\n' +
+    codecs.open(os.path.join(dirname, 'README.rst'), encoding='utf-8').read() + '\n' +
     codecs.open(os.path.join(dirname, 'CHANGES.rst'), encoding='utf-8').read()
 )
 
 setup(
     name='fingerprint',
-    version='1.0.0',
+    version='2.0.0 Pre Release',
     description='Fingerprint Windows System Status',
     long_description=long_description,
     author='Robert Nowotny',
