@@ -16,7 +16,7 @@ class FileDiff(object):
         """
         >>> conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
         >>> conf.fp2_path = './testfiles_source/fp_files_result2_difftest.csv'
-        >>> conf.fp_result_filename = './testresults/fp_files_diff_1_2.csv'
+        >>> conf.f_output = './testresults/fp_files_diff_1_2.csv'
         >>> file_diff = FileDiff()
         >>> file_diff.create_diff_file()
 

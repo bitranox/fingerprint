@@ -65,7 +65,7 @@ def main(fingerprint_name:str,
     :param field_length_limit:          data from registry, default set to maximum length of a cell in excel (32767) - we can support much longer fields
     :return:
 
-    >>> main(fingerprint_name='test', fp_files_dir='c:/', fingerprint_result_dir='c:/test')
+    >>> main(fingerprint_name='test', fp_dir='c:/', fingerprint_result_dir='c:/test')
 
     """
 
@@ -83,7 +83,7 @@ def main(fingerprint_name:str,
     logger.info('fingerprint_name     : {}'.format(fingerprint_name))
 
     logfile_fullpath = get_logfile_fullpath(fingerprint_result_dir, fingerprint_name)
-    config_file_logger(logfile_fullpath)
+    setup_file_logging(logfile_fullpath)
 
     with FingerPrintFiles(fingerprint_name=fingerprint_name,
                           fingerprint_result_dir=fingerprint_result_dir,

@@ -26,7 +26,7 @@ def create_testfiles_fingerprint_1(timestamp:time):
 
 def modify_testfiles_fingerprint_2(timestamp:time):
     """
-    >>> fp_files = FingerPrintFiles(fp_files_dir = './testfiles/', fp_result_filename = './' )
+    >>> fp_files = FingerPrintFiles(fp_dir = './testfiles/', f_output = './' )
     >>> f_time = time.time()
     >>> create_testfiles_fingerprint_1(f_time)
     >>> fileinfo1_1 = get_fileinfo('./testfiles/file1_no_changes.txt')

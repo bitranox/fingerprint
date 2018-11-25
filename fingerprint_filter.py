@@ -93,7 +93,7 @@ def main(procmon_csv:str,
                                             procmon_csv=procmon_csv,
                                             fingerprint_file_csv=fingerprint_file_csv,
                                             fingerprint_reg_csv=fingerprint_reg_csv)
-    config_file_logger(logfile_fullpath)
+    setup_file_logging(logfile_fullpath)
 
     logger.info('filtering {}, {} and {}'.format(fingerprint_file_csv, fingerprint_reg_csv, procmon_csv))
 

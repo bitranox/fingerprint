@@ -20,7 +20,7 @@ def get_commandline_parameters():
     >>> conf.interactive
     False
     """
-    parser = argparse.ArgumentParser(description='create fingerprint of the files under --fp_files_dir ')
+    parser = argparse.ArgumentParser(description='create fingerprint of the files under --fp_dir ')
     parser.add_argument('positional_ignored', type=str, nargs='*', help='Positional Arguments are ignored')
     parser.add_argument('--fp1', type=str, required=False, default='', help='path to the first fingerprint, e.g. c:\\results\\fp_files_result1.csv')
     parser.add_argument('--fp2', type=str, required=False, default='', help='path to the second fingerprint, e.g. c:\\results\\fp_files_result2.csv')
@@ -56,7 +56,7 @@ def main():
     check_fp_result_filename()
 
     conf.logfile_fullpath = lib_helper_functions.strip_extension(conf.fp_result_filename) + '.log'
-    lib_helper_functions.config_file_logger(logfile_fullpath=conf.logfile_fullpath)
+    lib_helper_functions.setup_file_logging(logfile_fullpath=conf.logfile_fullpath)
 
     logger.info('fingerprint_1     : {}'.format(conf.fp1_path))
     logger.info('fingerprint_2     : {}'.format(conf.fp2_path))
@@ -73,16 +73,16 @@ def main():
 def check_fp_result_filename(test_input:str= ''):
     """
     >>> conf.interactive = False
-    >>> conf.fp_result_filename='./testresults/fp_files_diff_1_2.csv'
-    >>> check_fp_result_filename()
+    >>> conf.f_output='./testresults/fp_files_diff_1_2.csv'
+    >>> check_f_output()
 
-    >>> conf.fp_result_filename='x:/testresults/fp_files_result_test'
-    >>> check_fp_result_filename()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> conf.f_output='x:/testresults/fp_files_result_test'
+    >>> check_f_output()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
     SystemExit: 1
     >>> conf.interactive = True
-    >>> check_fp_result_filename(test_input='./testresults/fp_files_result1.csv')
+    >>> check_f_output(test_input='./testresults/fp_files_result1.csv')
 
     can not write to x:/testresults/fp_files_result_test.csv, probably access rights
 
@@ -161,23 +161,23 @@ def is_fp_input_file_ok(f_path:str)->bool:
 
 def is_fp_result_filename_ok(f_path:str)->bool:
     """
-    >>> is_fp_result_filename_ok(f_path='./testresults/fp_files_result_test.csv')
+    >>> is_f_output_ok(f_path='./testresults/fp_files_result_test.csv')
     True
-    >>> is_fp_result_filename_ok(f_path='./testresults/fp_files_result_test')
+    >>> is_f_output_ok(f_path='./testresults/fp_files_result_test')
     True
-    >>> is_fp_result_filename_ok(f_path='x:/testresults/fp_files_result_test')
+    >>> is_f_output_ok(f_path='x:/testresults/fp_files_result_test')
     False
     """
     # noinspection PyBroadException
     try:
-        lib_helper_functions.touch_file_create_directory(f_path=f_path)
+        lib_helper_functions.create_path_and_check_permission(f_path=f_path)
         return True
     except Exception:
         return False
 
 def set_logfile_fullpath():
     """
-    >>> conf.fp_result_filename = './testresults/fp_files_result_test'
+    >>> conf.f_output = './testresults/fp_files_result_test'
     >>> set_logfile_fullpath()
     >>> conf.logfile_fullpath
     './testresults/fp_files_result_test.log'

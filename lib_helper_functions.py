@@ -92,23 +92,6 @@ def config_console_logger():
     console.setFormatter(formatter)
     logging.getLogger().addHandler(console)
 
-def config_file_logger(logfile_fullpath:str):
-    logfile_dir = os.path.dirname(logfile_fullpath)
-    # noinspection PyBroadException
-    try:
-        if not os.path.isdir(logfile_dir):
-            os.makedirs(logfile_dir, exist_ok=True)
-
-        file_logger = logging.FileHandler(filename=logfile_fullpath, mode='w', encoding='utf-8')
-        file_logger.setLevel(logging.DEBUG)
-        datefmt = '%y-%m-%d %H:%M:%S'
-        formatter = logging.Formatter('[%(asctime)s] %(levelname)-8s: %(message)s', datefmt)
-        file_logger.setFormatter(formatter)
-        logging.getLogger().addHandler(file_logger)
-
-    except Exception:
-        logger.error('can not configure logfile writer - probably no permission to create directory {}'.format(logfile_dir))
-
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
@@ -127,12 +110,46 @@ def strip_extension(file_fullpath:str)->str:
     strip_file_fullpath = os.path.join(file_path, file_base).replace('\\','/')
     return strip_file_fullpath
 
-def touch_file_create_directory(f_path:str)->bool:
+def create_path_and_check_permission(f_path:str):
     f_dir = os.path.dirname(f_path)
     try:
         if not os.path.isdir(f_dir):
             os.makedirs(f_dir, exist_ok=True)
         Path(f_path).touch()
-        return True
     except Exception:
-        raise RuntimeError('can not create {}, probably not enough rights'.format(f_path))
+        s_error = 'can not create {}, probably not enough rights'.format(f_path)
+        logger.error(s_error)
+        raise RuntimeError(s_error)
+
+class SetupFileLogging(object):
+    def __init__(self, f_output: str):
+        self.f_output = f_output
+        self.logfile_fullpath = self.get_logfile_name()
+        self.setup_file_logging_or_log_error()
+
+    def get_logfile_name(self) -> str:
+        logfile_fullpath = strip_extension(self.f_output) + '.log'
+        return logfile_fullpath
+
+    def setup_file_logging_or_log_error(self):
+        # noinspection PyBroadException
+        try:
+            self.setup_file_logging()
+        except Exception:
+            self.log_error()
+
+    def setup_file_logging(self):
+        create_path_and_check_permission(self.logfile_fullpath)
+        self.setup_file_logging_handler()
+
+    def setup_file_logging_handler(self):
+        file_logger = logging.FileHandler(filename=self.logfile_fullpath, mode='w', encoding='utf-8')
+        file_logger.setLevel(logging.DEBUG)
+        datefmt = '%y-%m-%d %H:%M:%S'
+        formatter = logging.Formatter('[%(asctime)s] %(levelname)-8s: %(message)s', datefmt)
+        file_logger.setFormatter(formatter)
+        logging.getLogger().addHandler(file_logger)
+
+    def log_error(self):
+        logger.error('can not configure logfile writer - probably no permission to create {}'.format(
+            os.path.dirname(self.logfile_fullpath)))

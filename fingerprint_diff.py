@@ -66,7 +66,7 @@ def main(fingerprint_name_1:str,
 
     :return:
 
-    >>> main(fingerprint_name_1='test', fingerprint_name_2='test2', fp_files_dir='c:/', fingerprint_result_dir='c:/test')
+    >>> main(fingerprint_name_1='test', fingerprint_name_2='test2', fp_dir='c:/', fingerprint_result_dir='c:/test')
 
     """
     config_console_logger()
@@ -80,7 +80,7 @@ def main(fingerprint_name_1:str,
         fingerprint_name_2 = input('name of the fingerprint_2 (e.g. test2): ')
 
     logfile_fullpath = get_logfile_fullpath(fingerprint_result_dir, fingerprint_name_1, fingerprint_name_2)
-    config_file_logger(logfile_fullpath)
+    setup_file_logging(logfile_fullpath)
 
     logger.info('creating diff between fingerprints {} and {}'.format(fingerprint_name_1, fingerprint_name_2))
 
