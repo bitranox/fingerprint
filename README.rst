@@ -13,7 +13,7 @@ You can also use third party tools like "Meld", "FC", "diff" to compare fingerpr
 
 You can use fingerprint in batchfiles to automatically filter out events of Your interest - its batch friendly
 
-sources are included, but You just might use the .exe files created with pyinstaller from `Releases <https://github.com/bitranox/fingerprint/releases>`_
+sources are included, but You just might use the fp.exe file created with pyinstaller from `Releases <https://github.com/bitranox/fingerprint/releases>`_
 
 Usage Scenarios
 ---------------
@@ -27,11 +27,13 @@ check the `Wiki <https://github.com/bitranox/fingerprint/wiki>`_
 
 Installation
 ------------
-no installation required, just use the .exe files from `Releases <https://github.com/bitranox/fingerprint/releases>`_
+no installation required, just use the fp.exe file from `Releases <https://github.com/bitranox/fingerprint/releases>`_
 
 Requirements
 ---------------
 following Packets will be installed / needed (when using .py files):
+
+click
 
 python-registry
 
@@ -39,7 +41,7 @@ pyinstaller (if You want to create Your own .exe Files)
 
 Acknowledgement
 ---------------
-Inspired by Regshot, InstallWatch Pro, SpyMe Tools, RegDiff, WhatChanged, RegFromApp and others
+Inspired by Regshot, InstallWatch Pro, SpyMe Tools, RegDiff, WhatChanged, RegFromApp, Uninstaller Pro and others
 
 Contribute
 ----------
@@ -58,36 +60,31 @@ Lets make s walk-through by example. Lets assume we have a software with "Trial 
 
 After uninstalling and reinstalling the software, it still shows "Trial Period ended" - so this software is not completely uninstalling, leaving some files or registry entries behind.
 
-all programs are started from the commandline. Use <command> -h for showing the help with all commandline parameters.
+all programs are started from the commandline. Use fp.exe [command] --help for showing the help with all commandline parameters.
 
-- STEP1 - create fingerprint on a clean system. 
-  use "fingerprint.exe" with elevated rights (run as administrator) to create a fingerprint named "before-install".
-- STEP2 - create fingerprint after installing named "after-install"
-- STEP3 - create fingerprint after running the software (before expiration), named "run-ok",
-  use procmon to log all system activity and save the log as csv file "procmon-run-ok.csv"
-- STEP4 - create fingerprint after running the software (after expiration), named "run-expired", 
-  use procmon to create "procmon-run-expired.csv"
-- STEP5 - create fingerprint after uninstalling the software, named "uninstall"
-- STEP6 - create fingerprint after re-installing the software, named "reinstall", 
-  use procmon to create "procmon-reinstall.csv"
-- STEP7 - create fingerprint after run the software until expiration message named "reinstall-expired",
-  use procmon to create "procmon-reinstall-expired.csv"
-- STEP8 - compare Snapshots and Filter Procmon Logs
-  use "fingerprint-diff.exe" to analyze the changes between different steps.
+STEP1: create fingerprint of drive c:\\ on a clean system:
+ fp.exe files --fp_dir=c:\\ --f_output=c:\\fp_results\\fp_files_clean.csv
 
-In this particular case, create a diff between "before-install" and "uninstall" - the diff files will now state all system changes between the clean machine and the state after uninstalling the software.
+STEP2: create fingerprint after installing, running and uninstalling the software:
+ fp.exe files --fp_dir=c:\\ --f_output=c:\\fp_results\\fp_files_uninstalled.csv
 
-- STEP9 - Filter the differences with "fingerprint-filter.exe"
+STEP3: create diff files. In that files all changes between clean and uninstalled state are stored:
+ fp.exe files_diff --fp1=c:\\fp_results\\fp_files_uninstalled.csv --fp2=c:\\fp_results\fp_files_uninstalled.csv --f_output=c:\\fp_results\\files_changed.csv
 
-Now filter the differences with the procmon logfile "procmon-reinstall-expired.csv" - so You will identify which of the remaining files or registry keys were accessed.
- 
+STEP4: reinstall the software
+ use procmon to log all system activity and save the log as csv file "c:\\fp_results\\reinstall_procmon.csv"
+
+Filtering Procmon Logfiles and registry fingerprints will be explained soon, since it is in refractoring stage now.
+ If You are inpatient You might use the old Version 1.6 (from releases) .
+
+
 
 REMARKS
 -------
 
 You might record quite some noise - there is no filter to sort it out at the moment. On the other hand - I would hide exactly in the noise, so I left it
 
-Procmon Logfiles can get quite big - You might set some appropriate filters there.
+Procmon Logfiles can get quite big - You might set some appropriate filters there (for the processes or programs You examine).
 
 On my Windows 10 Machine from about 1.300.000 Registry Values some hundreds are not readable - just ignore those errors, its mostly device- or network drivers. I told Willi from python-registry about it, it might be fixed in the future.
 
