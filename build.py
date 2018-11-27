@@ -6,8 +6,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)-12s %(level
 
 # enum34 needs to be uninstalled on python3.7 in order to make pyinstaller work
 
-ls_commands = ['pyinstaller --onefile fp_files.py -y',
-               'pyinstaller --onefile fp_files_diff.py -y']
+ls_commands = ['pyinstaller --onefile fp.py -y']
 
 for s_command in ls_commands:
     response = run_command(s_command)

@@ -1,6 +1,6 @@
 import csv
 from lib_data_structures import *
-from fp_files_diff_conf import fp_files_diff_conf as conf
+from fp_conf import fp_diff_files_conf
 
 class FileDiff(object):
     def __init__(self):
@@ -14,9 +14,9 @@ class FileDiff(object):
 
     def create_diff_file(self):
         """
-        >>> conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
-        >>> conf.fp2_path = './testfiles_source/fp_files_result2_difftest.csv'
-        >>> conf.f_output = './testresults/fp_files_diff_1_2.csv'
+        >>> fp_diff_files_conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
+        >>> fp_diff_files_conf.fp2_path = './testfiles_source/fp_files_result2_difftest.csv'
+        >>> fp_diff_files_conf.f_output = './testresults/fp_files_diff_1_2.csv'
         >>> file_diff = FileDiff()
         >>> file_diff.create_diff_file()
 
@@ -31,7 +31,7 @@ class FileDiff(object):
 
         l_fileinfo:[DataStructFileInfo] = list()
 
-        with open(conf.fp2_path, newline='', encoding='utf-8-sig') as csv_fp_2:
+        with open(fp_diff_files_conf.fp2_path, newline='', encoding='utf-8-sig') as csv_fp_2:
             csv_reader_fp_2 = csv.DictReader(csv_fp_2, dialect='excel')
             # iterate new file fingerprints
             for dict_data_fp_2 in csv_reader_fp_2:
@@ -98,8 +98,9 @@ class FileDiff(object):
             setattr(fileinfo, key, data)
         return fileinfo
 
-    def write_diff_csv_file(self, l_fileinfo:[DataStructFileInfo]):
-        with open(conf.fp_result_filename, 'w', encoding='utf-8',newline='') as f_out:
+    @staticmethod
+    def write_diff_csv_file(l_fileinfo:[DataStructFileInfo]):
+        with open(fp_diff_files_conf.f_output, 'w', encoding='utf-8',newline='') as f_out:
             fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames)
             csv_writer.writeheader()
@@ -110,13 +111,13 @@ def get_hashed_dict_fp_1()->{}:
     """
     :return:
 
-    >>> conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
+    >>> fp_diff_files_conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
     >>> hashed_dict = get_hashed_dict_fp_1()
     >>> hashed_dict  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     {'.\\\\testfiles\\\\file1_no_changes.txt': OrderedDict([...])}
     """
     hashed_dict = dict()
-    with open(conf.fp1_path, newline='', encoding='utf-8-sig') as csvfile:
+    with open(fp_diff_files_conf.fp1_path, newline='', encoding='utf-8-sig') as csvfile:
         csv_reader = csv.DictReader(csvfile, dialect='excel')
         for dict_data in csv_reader:
             hashed_dict[dict_data['path']] = dict_data.copy()

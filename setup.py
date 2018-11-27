@@ -33,6 +33,6 @@ setup(
     author='Robert Nowotny',
     author_email='rnowotny1966@gmail.com',
     url='https://github.com/bitranox/fingerprint',
-    packages=['fingerprint','fingerprint-diff','fingerprint-filter'],
-    install_requires=['python-registry'],
+    packages=['fp'],
+    install_requires=['click', 'python-registry'],
     classifiers=CLASSIFIERS)
