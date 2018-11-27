@@ -63,16 +63,16 @@ After uninstalling and reinstalling the software, it still shows "Trial Period e
 all programs are started from the commandline. Use fp.exe [command] --help for showing the help with all commandline parameters.
 
 STEP1: create fingerprint of drive c:\\ on a clean system:
- fp.exe files --fp_dir=c:\\ --f_output=c:\\fp_results\\fp_files_clean.csv
+ fp.exe files --fp_dir=c:\\ --f_output=c:\\fp\\fp1.csv
 
 STEP2: create fingerprint after installing, running and uninstalling the software:
- fp.exe files --fp_dir=c:\\ --f_output=c:\\fp_results\\fp_files_uninstalled.csv
+ fp.exe files --fp_dir=c:\\ --f_output=c:\\fp\\fp2.csv
 
 STEP3: create diff files. In that files all changes between clean and uninstalled state are stored:
- fp.exe files_diff --fp1=c:\\fp_results\\fp_files_clean.csv --fp2=c:\\fp_results\fp_files_uninstalled.csv --f_output=c:\\fp_results\\files_changed.csv
+ fp.exe files_diff --fp1=c:\\fp\\fp1.csv --fp2=c:\\fp\\fp2.csv --f_output=c:\\fp\\fp1-fp2.csv
 
 STEP4: reinstall the software
- use procmon to log all system activity and save the log as csv file "c:\\fp_results\\reinstall_procmon.csv"
+ use procmon to log all system activity and save the log as csv file "c:\\fp\\reinstall_procmon.csv"
 
 Filtering Procmon Logfiles and registry fingerprints will be explained soon, since it is in refractoring stage now.
  If You are inpatient You might use the old Version 1.6 (from releases) .
