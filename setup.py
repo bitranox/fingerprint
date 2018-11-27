@@ -1,6 +1,7 @@
 """Setuptools entry point."""
 import codecs
 import os
+from fp_conf import fp_conf
 
 try:
     from setuptools import setup
@@ -27,7 +28,7 @@ long_description = (
 
 setup(
     name='fingerprint',
-    version='2.0.0 Pre Release',
+    version=fp_conf.version,
     description='Fingerprint Windows System Status',
     long_description=long_description,
     author='Robert Nowotny',
