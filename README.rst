@@ -69,7 +69,7 @@ STEP2: create fingerprint after installing, running and uninstalling the softwar
  fp.exe files --fp_dir=c:\\ --f_output=c:\\fp_results\\fp_files_uninstalled.csv
 
 STEP3: create diff files. In that files all changes between clean and uninstalled state are stored:
- fp.exe files_diff --fp1=c:\\fp_results\\fp_files_uninstalled.csv --fp2=c:\\fp_results\fp_files_uninstalled.csv --f_output=c:\\fp_results\\files_changed.csv
+ fp.exe files_diff --fp1=c:\\fp_results\\fp_files_clean.csv --fp2=c:\\fp_results\fp_files_uninstalled.csv --f_output=c:\\fp_results\\files_changed.csv
 
 STEP4: reinstall the software
  use procmon to log all system activity and save the log as csv file "c:\\fp_results\\reinstall_procmon.csv"
