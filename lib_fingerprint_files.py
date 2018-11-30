@@ -1,13 +1,13 @@
-import csv
-from fp_conf import fp_files_conf
-import glob
-import logging
-from lib_data_structures import *
-from lib_helper_functions import *
-from lib_hash import get_file_hash_preserve_access_dates
-import os
 import concurrent.futures
-from pathlib import Path
+import csv
+from fp_conf import fp_files_conf, fp_conf
+import glob
+import lib_data_structures
+import lib_hash
+import lib_helper_functions
+import logging
+import os
+import time
 
 logger = logging.getLogger()
 
@@ -19,7 +19,7 @@ class FingerPrintFiles(object):
     def __enter__(self):
         """
         >>> fp_files_conf.fp_dir='./testfiles/'
-        >>> fp_files_conf.f_output='./testresults/fp_files_result1.csv'
+        >>> fp_conf.f_output='./testresults/fp_files_result1.csv'
         >>> with FingerPrintFiles() as fingerprint:
         ...   pass
 
@@ -36,26 +36,26 @@ class FingerPrintFiles(object):
         >>> timestamp = time.time()
         >>> test.create_testfiles_fingerprint_1(timestamp)
         >>> fp_files_conf.fp_dir='./testfiles/'
-        >>> fp_files_conf.f_output='./testresults/fp_files_result1.csv'
+        >>> fp_conf.f_output='./testresults/fp_files_result1.csv'
         >>> fingerprint=FingerPrintFiles()
         >>> fingerprint.create_fp()
 
         >>> test.modify_testfiles_fingerprint_2(timestamp)
         >>> fp_files_conf.fp_dir='./testfiles/'
-        >>> fp_files_conf.f_output='./testresults/fp_files_result2.csv'
+        >>> fp_conf.f_output='./testresults/fp_files_result2.csv'
         >>> fingerprint=FingerPrintFiles()
         >>> fingerprint.create_fp()
 
         """
 
-        logger.info('create fingerprint for files from {}, storing results in {}'.format(fp_files_conf.fp_dir, fp_files_conf.f_output))
+        logger.info('create fingerprint for files from {}, storing results in {}'.format(fp_files_conf.fp_dir, fp_conf.f_output))
 
         n_files:int = 0
         file_iterator = get_file_iterator()
 
-        with open(fp_files_conf.f_output, 'w', encoding='utf-8', newline='') as f_out:
+        with open(fp_conf.f_output, 'w', encoding='utf-8', newline='') as f_out:
 
-            fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
+            fieldnames = lib_data_structures.DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
             csv_writer.writeheader()
 
@@ -73,25 +73,25 @@ class FingerPrintFiles(object):
         >>> timestamp = time.time()
         >>> test.create_testfiles_fingerprint_1(timestamp)
         >>> fp_files_conf.fp_dir='./testfiles/'
-        >>> fp_files_conf.f_output='./testresults/fp_files_result1.csv'
+        >>> fp_conf.f_output='./testresults/fp_files_result1.csv'
         >>> fingerprint=FingerPrintFiles()
         >>> fingerprint.create_fp_mp()
 
         >>> test.modify_testfiles_fingerprint_2(timestamp)
         >>> fp_files_conf.fp_dir='./testfiles/'
-        >>> fp_files_conf.f_output='./testresults/fp_files_result2.csv'
+        >>> fp_conf.f_output='./testresults/fp_files_result2.csv'
         >>> fingerprint=FingerPrintFiles()
         >>> fingerprint.create_fp_mp()
 
         """
 
-        logger.info('create fingerprint for files from {}, storing results in {}'.format(fp_files_conf.fp_dir, fp_files_conf.f_output))
+        logger.info('create fingerprint for files from {}, storing results in {}'.format(fp_files_conf.fp_dir, fp_conf.f_output))
 
         n_files:int = 0
         file_iterator = get_file_iterator()
 
-        with open(fp_files_conf.f_output, 'w', encoding='utf-8', newline='') as f_out:
-            fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
+        with open(fp_conf.f_output, 'w', encoding='utf-8', newline='') as f_out:
+            fieldnames = lib_data_structures.DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
             csv_writer.writeheader()
 
@@ -110,7 +110,7 @@ def get_fileinfo(filename:str, hash_files:bool=True):   # we need to pass hash_f
     >>> timestamp = time.time()
     >>> test.create_testfiles_fingerprint_1(timestamp)
     >>> fp_files_conf.fp_dir='./testfiles/'
-    >>> fp_files_conf.f_output='./testresults/fp_files_test_result.csv'
+    >>> fp_conf.f_output='./testresults/fp_files_test_result.csv'
     >>> fingerprint=FingerPrintFiles()
     >>> fileinfo = get_fileinfo('./testfiles/file1_no_changes.txt') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     >>> fileinfo.path
@@ -129,9 +129,9 @@ def get_fileinfo(filename:str, hash_files:bool=True):   # we need to pass hash_f
     """
 
     dict_attribute_functions = {'accessed_float':os.path.getatime, 'modified_float':os.path.getmtime,
-                                'created_float':os.path.getctime,'size':os.path.getsize, 'hash':get_file_hash_preserve_access_dates}
+                                'created_float':os.path.getctime,'size':os.path.getsize, 'hash':lib_hash.get_file_hash_preserve_access_dates}
 
-    fileinfo = DataStructFileInfo()
+    fileinfo = lib_data_structures.DataStructFileInfo()
     fileinfo.path = filename
 
     for attribute,file_property_function in dict_attribute_functions.items():
@@ -153,8 +153,8 @@ def get_file_iterator():
     return file_iter
 
 def check_f_output_permission():
-    lib_helper_functions.create_path_and_check_permission(fp_files_conf.f_output)
-    os.remove(fp_files_conf.f_output)
+    lib_helper_functions.create_path_and_check_permission(fp_conf.f_output)
+    os.remove(fp_conf.f_output)
 
 def format_fp_files_dir()->str:
     """

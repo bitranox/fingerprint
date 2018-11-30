@@ -1,8 +1,9 @@
 import argparse
 import click
-from fp_conf import fp_conf, fp_files_conf, fp_diff_files_conf
+from fp_conf import fp_conf, fp_files_conf, fp_diff_files_conf, fp_reg_conf
 import lib_diff_files
 import lib_fingerprint_files
+import lib_fingerprint_registry
 import lib_helper_functions
 import logging
 import multiprocessing
@@ -22,7 +23,7 @@ def fp():
 @click.option('--fp_dir', type=click.Path(), default='', help='path to the directory to fingerprint, e.g. c:\\test\\')
 @click.option('--f_output', type=click.Path(), default='', help='path to the output file, e.g. c:\\results\\fp_files_result1.csv')
 @click.option('--batchmode', is_flag=True, help='no user interactions')
-@click.option('--no_admin', is_flag=True, help='do not force admin rights, not recommended')
+@click.option('--no_admin', is_flag=True, help='do not check for admin rights, not recommended')
 @click.option('--no_hashing', is_flag=True, help='do not calculate file hashes, not recommended')
 @click.option('--no_mp', is_flag=True, help='no multiprocessing - preserves ordering of files in the result')
 def files(**kwargs):
@@ -66,26 +67,16 @@ def files(**kwargs):
     lib_helper_functions.config_console_logger()
     lib_helper_functions.inform_if_not_run_as_admin(exit_if_not_admin=fp_files_conf.exit_if_not_admin, interactive=fp_conf.interactive)
     logger.info('create files fingerprint {}'.format(fp_conf.version))
-
-    check_fp_dir()
-    check_f_output()
-    lib_helper_functions.SetupFileLogging(f_output=fp_files_conf.f_output)
-
-    logger.info('fingerprinting directory : {}'.format(fp_files_conf.fp_dir))
-    logger.info('results filename         : {}'.format(fp_files_conf.f_output))
-    logger.info('file hashing             : {}'.format(fp_files_conf.hash_files))
-    logger.info('multiprocessing          : {}'.format(fp_files_conf.multiprocessing))
-
+    check_or_request_fp_dir()
+    check_or_request_f_output()
+    lib_helper_functions.SetupFileLogging(f_output=fp_conf.f_output)
+    log_files_parameter()
     with lib_fingerprint_files.FingerPrintFiles() as fingerprint_files:
         if fp_files_conf.multiprocessing:                # test c:\windows : 66 seconds
             fingerprint_files.create_fp_mp()
         else:
             fingerprint_files.create_fp()       # test c:\windows : 124 seconds
-
-    logger.info('Finished\n\n')
-    lib_helper_functions.logger_flush_all_handlers()
-    if fp_conf.interactive:
-        input('enter for exit, check the logfile')
+    exit_message()
 
 @fp.command()
 @click.option('--fp1', type=click.Path(), default='', help='path to the first fingerprint, e.g. c:\\results\\fp_files_result1.csv')
@@ -113,53 +104,73 @@ def files_diff(**kwargs):
     lib_helper_functions.config_console_logger()
     logger.info('create file fingerprint diff {}'.format(fp_conf.version))
 
-    fp_diff_files_conf.fp1_path = check_fp_file(f_input_file=fp_diff_files_conf.fp1_path, file_number=1)
-    fp_diff_files_conf.fp2_path = check_fp_file(f_input_file=fp_diff_files_conf.fp2_path, file_number=2)
-    check_f_output()
-
-    lib_helper_functions.SetupFileLogging(f_output=fp_diff_files_conf.f_output)
-
-    logger.info('fingerprint_1     : {}'.format(fp_diff_files_conf.fp1_path))
-    logger.info('fingerprint_2     : {}'.format(fp_diff_files_conf.fp2_path))
-    logger.info('results filename  : {}'.format(fp_diff_files_conf.f_output))
-
+    fp_diff_files_conf.fp1_path = check_or_request_fp_file(f_input_file=fp_diff_files_conf.fp1_path, file_number=1)
+    fp_diff_files_conf.fp2_path = check_or_request_fp_file(f_input_file=fp_diff_files_conf.fp2_path, file_number=2)
+    check_or_request_f_output()
+    lib_helper_functions.SetupFileLogging(f_output=fp_conf.f_output)
+    log_files_diff_parameter()
     with lib_diff_files.FileDiff() as file_diff:
         file_diff.create_diff_file()
+    exit_message()
 
-    logger.info('Finished\n\n')
-    lib_helper_functions.logger_flush_all_handlers()
-    if fp_conf.interactive:
-        input('enter for exit, check the logfile')
+@fp.command()
+@click.option('--f_output', type=click.Path(), default='', help='path to the output file, e.g. c:\\results\\fp_registry_result1.csv')
+@click.option('--field_length_limit', type=click.INT, default=32767, help='data from registry, default set to maximum length of a cell in excel (32767) - but we can support much longer fields')
+@click.option('--reg_save_additional_parameters', default='', help='optional reg save parameters, e.g. "/reg:64" or "/reg:32"')
+@click.option('--do_not_delete_hive_copies', is_flag=True, help='do not delete the registry hive files')
+@click.option('--batchmode', is_flag=True, help='no user interactions')
+def reg(**kwargs):
+    """
+    (fp reg --help for more help on that command)
+    """
+
+    reg_save_commandline_options_to_conf(**kwargs)
+    lib_helper_functions.config_console_logger()
+    logger.info('create registry fingerprint {}'.format(fp_conf.version))
+    check_or_request_f_output(fp_conf.f_output)
+    lib_helper_functions.SetupFileLogging(f_output=fp_conf.f_output)
+    log_reg_parameter()
+    with lib_fingerprint_registry.FingerPrintRegistry() as fingerprint_registry:
+        fingerprint_registry.create_fingerprint_registry()
+    exit_message()
 
 
 def files_save_commandline_options_to_conf(**kwargs):
+    save_common_parameters_to_conf(**kwargs)
     fp_files_conf.fp_dir = kwargs['fp_dir']
-    fp_files_conf.f_output = kwargs['f_output']
-    fp_conf.interactive = not kwargs['batchmode']
     fp_files_conf.exit_if_not_admin = not kwargs['no_admin']
     fp_files_conf.hash_files = not kwargs['no_hashing']
     fp_files_conf.multiprocessing = not kwargs['no_mp']
 
 def diff_files_save_commandline_options_to_conf(**kwargs):
+    save_common_parameters_to_conf(**kwargs)
     fp_diff_files_conf.fp1_path = kwargs['fp1']
     fp_diff_files_conf.fp2_path = kwargs['fp2']
-    fp_diff_files_conf.f_output = kwargs['f_output']
+
+def reg_save_commandline_options_to_conf(**kwargs):
+    save_common_parameters_to_conf(**kwargs)
+    fp_reg_conf.field_length_limit = kwargs['field_length_limit']
+    fp_reg_conf.reg_save_additional_parameters = kwargs['reg_save_additional_parameters']
+    fp_reg_conf.delete_hive_copies = not kwargs['do_not_delete_hive_copies']
+
+def save_common_parameters_to_conf(**kwargs):
+    fp_conf.f_output = kwargs['f_output']
     fp_conf.interactive = not kwargs['batchmode']
 
-def check_fp_file(f_input_file:str, file_number:int, test_input:str= '')->str:
+def check_or_request_fp_file(f_input_file:str, file_number:int, test_input:str= '')->str:
     """
     >>> fp_conf.interactive = True
-    >>> check_fp_file(f_input_file='./testfiles/', file_number=1,test_input='./testfiles_source/fp_files_result1_difftest.csv')
+    >>> check_or_request_fp_file(f_input_file='./testfiles/', file_number=1,test_input='./testfiles_source/fp_files_result1_difftest.csv')
     './testfiles_source/fp_files_result1_difftest.csv'
 
     >>> fp_conf.interactive = False
-    >>> check_fp_file(f_input_file='./testfiles/', file_number=1)  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> check_or_request_fp_file(f_input_file='./testfiles/', file_number=1)  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     SystemExit: 1
 
     >>> fp_conf.interactive = False
-    >>> check_fp_file(f_input_file='./testfiles_source/fp_files_result1_difftest.csv', file_number=1)
+    >>> check_or_request_fp_file(f_input_file='./testfiles_source/fp_files_result1_difftest.csv', file_number=1)
     './testfiles_source/fp_files_result1_difftest.csv'
 
 
@@ -202,41 +213,39 @@ def is_fp_input_file_ok(f_path:str)->bool:
     except Exception:
         return False
 
-
-def check_f_output(test_input:str=''):
+def check_or_request_f_output(test_input:str= ''):
     """
     >>> fp_conf.interactive = False
-    >>> fp_files_conf.f_output='./testresults/fp_files_result1.csv'
-    >>> check_f_output()
+    >>> fp_conf.f_output = './testresults/fp_files_result1.csv'
+    >>> check_or_request_f_output()
 
-    >>> fp_files_conf.f_output='x:/testresults/fp_files_result_test'
-    >>> check_f_output()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> fp_conf.f_output = 'x:/testresults/fp_files_result_test'
+    >>> check_or_request_f_output()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
     SystemExit: 1
     >>> fp_conf.interactive = True
-    >>> check_f_output(test_input='./testresults/fp_files_result1.csv')
-
-    can not write to x:/testresults/fp_files_result_test.csv, probably access rights
+    >>> fp_conf.f_output = 'x:/testresults/fp_files_result_test'
+    >>> check_or_request_f_output(test_input='./testresults/fp_files_result1.csv')
 
     """
-    fp_files_conf.f_output = lib_helper_functions.strip_extension(fp_files_conf.f_output) + '.csv'
-    while not is_f_output_ok(f_path=fp_files_conf.f_output):
+    fp_conf.f_output = lib_helper_functions.strip_extension(fp_conf.f_output) + '.csv'
+    while not is_f_output_ok(f_path=fp_conf.f_output):
         if fp_conf.interactive:
             if test_input:
-                fp_files_conf.f_output = test_input
+                fp_conf.f_output = test_input
             else:
-                fp_files_conf.f_output = input('result filename (e.g. c:\\results\\<f_out>.csv ): ')
-                fp_files_conf.f_output = lib_helper_functions.strip_extension(fp_files_conf.f_output) + '.csv'
-            if not is_f_output_ok(f_path=fp_files_conf.f_output):
-                logger.info('can not write to {}, probably access rights'.format(fp_files_conf.f_output))
+                fp_conf.f_output = input('result filename (e.g. c:\\results\\<f_out>.csv ): ')
+                fp_conf.f_output = lib_helper_functions.strip_extension(fp_conf.f_output) + '.csv'
+            if not is_f_output_ok(f_path=fp_conf.f_output):
+                logger.info('can not write to {}, probably access rights'.format(fp_conf.f_output))
             else:
                 break
         else:
-            logger.info('can not write to {}, probably access rights'.format(fp_files_conf.f_output))
+            logger.info('can not write to {}, probably access rights'.format(fp_conf.f_output))
             sys.exit(1)
 
-def check_fp_dir(test_input:str= ''):
+def check_or_request_fp_dir(test_input:str= ''):
     """
     >>> import test
     >>> import lib_doctest
@@ -246,14 +255,14 @@ def check_fp_dir(test_input:str= ''):
 
     >>> fp_conf.interactive = False
     >>> fp_files_conf.fp_dir = './testfiles/'
-    >>> check_fp_dir()
+    >>> check_or_request_fp_dir()
     >>> fp_files_conf.fp_dir = './not_exist/'
-    >>> check_fp_dir()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> check_or_request_fp_dir()  # +ELLIPSIS, +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
         ...
     SystemExit: 1
     >>> fp_conf.interactive = True
-    >>> check_fp_dir(test_input='./testfiles/')  # +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> check_or_request_fp_dir(test_input='./testfiles/')  # +ELLIPSIS, +NORMALIZE_WHITESPACE
 
     can not read directory ./not_exist/
 
@@ -309,6 +318,33 @@ def is_f_output_ok(f_path:str)->bool:
         return True
     except Exception:
         return False
+
+def log_files_parameter():
+    logger.info('fingerprinting directory : {}'.format(fp_files_conf.fp_dir))
+    logger.info('file hashing             : {}'.format(fp_files_conf.hash_files))
+    logger.info('multiprocessing          : {}'.format(fp_files_conf.multiprocessing))
+    log_common_parameter()
+
+def log_files_diff_parameter():
+    logger.info('fp1       : {}'.format(fp_diff_files_conf.fp1_path))
+    logger.info('fp2       : {}'.format(fp_diff_files_conf.fp2_path))
+    log_common_parameter()
+
+def log_reg_parameter():
+    logger.info('field_length_limit             : {}'.format(fp_reg_conf.field_length_limit))
+    logger.info('reg_save_additional_parameters : {}'.format(fp_reg_conf.reg_save_additional_parameters))
+    logger.info('delete_hives                   : {}'.format(fp_reg_conf.delete_hive_copies))
+    log_common_parameter()
+
+def log_common_parameter():
+    logger.info('f_output                       : {}'.format(fp_conf.f_output))
+    logger.info('batchmode                      : {}'.format(not fp_conf.interactive))
+
+def exit_message():
+    logger.info('Finished\n\n')
+    lib_helper_functions.logger_flush_all_handlers()
+    if fp_conf.interactive:
+        input('enter for exit, check the logfile')
 
 
 if __name__ == '__main__':

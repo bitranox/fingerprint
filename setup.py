@@ -35,5 +35,5 @@ setup(
     author_email='rnowotny1966@gmail.com',
     url='https://github.com/bitranox/fingerprint',
     packages=['fp'],
-    install_requires=['click', 'python-registry'],
+    install_requires=['chardet', 'click', 'python-registry'],
     classifiers=CLASSIFIERS)

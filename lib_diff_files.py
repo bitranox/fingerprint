@@ -1,6 +1,6 @@
 import csv
-from lib_data_structures import *
-from fp_conf import fp_diff_files_conf
+import lib_data_structures
+from fp_conf import fp_diff_files_conf, fp_conf
 
 class FileDiff(object):
     def __init__(self):
@@ -16,20 +16,20 @@ class FileDiff(object):
         """
         >>> fp_diff_files_conf.fp1_path = './testfiles_source/fp_files_result1_difftest.csv'
         >>> fp_diff_files_conf.fp2_path = './testfiles_source/fp_files_result2_difftest.csv'
-        >>> fp_diff_files_conf.f_output = './testresults/fp_files_diff_1_2.csv'
+        >>> fp_conf.f_output = './testresults/fp_files_diff_1_2.csv'
         >>> file_diff = FileDiff()
         >>> file_diff.create_diff_file()
 
         """
 
-        l_fileinfo:[DataStructFileInfo] = self.get_l_diff_fileinfo()
+        l_fileinfo:[lib_data_structures.DataStructFileInfo] = self.get_l_diff_fileinfo()
         self.write_diff_csv_file(l_fileinfo=l_fileinfo)
 
-    def get_l_diff_fileinfo(self)->[DataStructFileInfo]:
+    def get_l_diff_fileinfo(self)->[lib_data_structures.DataStructFileInfo]:
 
         hashed_dict_fp_1 = get_hashed_dict_fp_1()
 
-        l_fileinfo:[DataStructFileInfo] = list()
+        l_fileinfo:[lib_data_structures.DataStructFileInfo] = list()
 
         with open(fp_diff_files_conf.fp2_path, newline='', encoding='utf-8-sig') as csv_fp_2:
             csv_reader_fp_2 = csv.DictReader(csv_fp_2, dialect='excel')
@@ -40,11 +40,10 @@ class FileDiff(object):
                     # if size or modified timestamp has been changed
                     fileinfo_fp_2 = self.get_fileinfo_from_dict(dict_data_fp_2)
                     fileinfo_fp_1 = self.get_fileinfo_from_dict(hashed_dict_fp_1[fileinfo_fp_2.path])
-                    fileinfo_fp_diff:DataStructFileInfo = self.get_fileinfo_from_dict(dict_data_fp_2)
+                    fileinfo_fp_diff:lib_data_structures.DataStructFileInfo = self.get_fileinfo_from_dict(dict_data_fp_2)
 
                     b_changed:bool = False
                     b_changed_silent:bool = True
-                    remark:str = ''
                     l_remark:[str] = list()
 
                     if fileinfo_fp_1.size != fileinfo_fp_2.size:
@@ -82,8 +81,8 @@ class FileDiff(object):
             l_fileinfo = l_fileinfo + self.get_l_deleted_file_info(hashed_dict_fp_1)
         return l_fileinfo
 
-    def get_l_deleted_file_info(self, hashed_dict_fp_1)->[DataStructFileInfo]:
-        l_fileinfo:[DataStructFileInfo] = list()
+    def get_l_deleted_file_info(self, hashed_dict_fp_1)->[lib_data_structures.DataStructFileInfo]:
+        l_fileinfo:[lib_data_structures.DataStructFileInfo] = list()
         # remaining Files were deleted
         for path, dict_file_info in hashed_dict_fp_1.items():
             fileinfo_fp_diff = self.get_fileinfo_from_dict(dict_file_info)
@@ -92,16 +91,16 @@ class FileDiff(object):
         return l_fileinfo
 
     @staticmethod
-    def get_fileinfo_from_dict(dict_file_info)->DataStructFileInfo:
-        fileinfo = DataStructFileInfo()
+    def get_fileinfo_from_dict(dict_file_info)->lib_data_structures.DataStructFileInfo:
+        fileinfo = lib_data_structures.DataStructFileInfo()
         for key, data in dict_file_info.items():
             setattr(fileinfo, key, data)
         return fileinfo
 
     @staticmethod
-    def write_diff_csv_file(l_fileinfo:[DataStructFileInfo]):
-        with open(fp_diff_files_conf.f_output, 'w', encoding='utf-8',newline='') as f_out:
-            fieldnames = DataStructFileInfo().get_data_dict_fieldnames()
+    def write_diff_csv_file(l_fileinfo:[lib_data_structures.DataStructFileInfo]):
+        with open(fp_conf.f_output, 'w', encoding='utf-8',newline='') as f_out:
+            fieldnames = lib_data_structures.DataStructFileInfo().get_data_dict_fieldnames()
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames)
             csv_writer.writeheader()
             for fileinfo in l_fileinfo:

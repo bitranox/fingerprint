@@ -86,13 +86,8 @@ You might record quite some noise - there is no filter to sort it out at the mom
 
 Procmon Logfiles can get quite big - You might set some appropriate filters there (for the processes or programs You examine).
 
-On my Windows 10 Machine from about 1.300.000 Registry Values some hundreds are not readable - just ignore those errors, its mostly device- or network drivers. I told Willi from python-registry about it, it might be fixed in the future.
-
 
 TODO
 ----
 
-- get the raw data for the unreadable registry keys - priority low, since those keys are not important at all
-- make commandline parameter to not delete the hive copies
-- tests, travis windows
-- refractoring
+- travis windows

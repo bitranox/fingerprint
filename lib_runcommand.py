@@ -1,3 +1,4 @@
+import lib_detect_encoding
 import locale
 import logging
 import os
@@ -6,7 +7,6 @@ import subprocess
 import sys
 
 logger = logging.getLogger()
-
 locale.setlocale(locale.LC_ALL, '')     # This sets the locale for all categories to the user’s default setting (typically specified in the LANG environment variable).
 
 class CommandResponse(object):
@@ -15,10 +15,16 @@ class CommandResponse(object):
         self.stdout:str = ''
         self.stderr: str = ''
 
-def run_command(s_command:str, s_input:str='', shell:bool=False, communicate:bool=True, wait_finish:bool=True, raise_on_error:bool=True)->CommandResponse:
+def run_command(s_command:str, shell:bool=False, communicate:bool=True, wait_finish:bool=True, raise_on_error:bool=True)->CommandResponse:
     """
-    >>> response = run_command('dir c:\python3') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> response = run_command('dir c:\python3', shell=True) # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     >>> response.stdout # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+
+    >>> response = run_command('dir c:\python3') # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+        ...
+    FileNotFoundError: ...
+
     """
     ls_args = shlex_split_multi_platform(s_command)
 
@@ -30,28 +36,14 @@ def run_command(s_command:str, s_input:str='', shell:bool=False, communicate:boo
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW      # HIDE CONSOLE
 
     my_process = subprocess.Popen(ls_args, startupinfo=startupinfo, stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell,
-                                  env=my_env)
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell, env=my_env)
 
     if communicate:
-
-        if s_input:
-            import time
-            time.sleep(1)
-            my_process.stdin.write(s_input.encode('utf-8'))
-            time.sleep(1)
-
         stdout, stderr = my_process.communicate()
-
-        try:
-            stdout = stdout.decode('utf-8')
-            stderr = stderr.decode('utf-8')
-        except UnicodeError:
-            stdout = stdout.decode('cp850')     # when using windows terminal
-            stderr = stderr.decode('cp850')     # when using windows terminal
-
-        returncode = my_process.returncode    # lese den Returncode
-
+        encoding = lib_detect_encoding.detect_encoding(stdout+stderr)
+        stdout = stdout.decode(encoding)
+        stderr = stderr.decode(encoding)
+        returncode = my_process.returncode
     else:
         stdout = None
         stderr = None
