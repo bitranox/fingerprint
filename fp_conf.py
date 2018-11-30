@@ -1,7 +1,7 @@
 class FPConf(object):
     def __init__(self):
         self.f_output: str = ''
-        self.version:str = '2.0.1 Prerelease'
+        self.version:str = '2.0.2 Prerelease'
         self.interactive:bool = True
 
 class FPFilesConf(object):
