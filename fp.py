@@ -118,6 +118,7 @@ def files_diff(**kwargs):
 @click.option('--field_length_limit', type=click.INT, default=32767, help='data from registry, default set to maximum length of a cell in excel (32767) - but we can support much longer fields')
 @click.option('--reg_save_additional_parameters', default='', help='optional reg save parameters, e.g. "/reg:64" or "/reg:32"')
 @click.option('--do_not_delete_hive_copies', is_flag=True, help='do not delete the registry hive files')
+@click.option('--no_admin', is_flag=True, help='do not check for admin rights, not recommended')
 @click.option('--batchmode', is_flag=True, help='no user interactions')
 def reg(**kwargs):
     """
@@ -126,6 +127,7 @@ def reg(**kwargs):
 
     reg_save_commandline_options_to_conf(**kwargs)
     lib_helper_functions.config_console_logger()
+    lib_helper_functions.inform_if_not_run_as_admin(exit_if_not_admin=fp_reg_conf.exit_if_not_admin, interactive=fp_conf.interactive)
     logger.info('create registry fingerprint {}'.format(fp_conf.version))
     check_or_request_f_output(fp_conf.f_output)
     lib_helper_functions.SetupFileLogging(f_output=fp_conf.f_output)
@@ -152,6 +154,7 @@ def reg_save_commandline_options_to_conf(**kwargs):
     fp_reg_conf.field_length_limit = kwargs['field_length_limit']
     fp_reg_conf.reg_save_additional_parameters = kwargs['reg_save_additional_parameters']
     fp_reg_conf.delete_hive_copies = not kwargs['do_not_delete_hive_copies']
+    fp_reg_conf.exit_if_not_admin = not kwargs['no_admin']
 
 def save_common_parameters_to_conf(**kwargs):
     fp_conf.f_output = kwargs['f_output']
