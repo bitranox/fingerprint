@@ -64,17 +64,20 @@ all programs are started from the commandline. Use fp.exe [command] --help for s
 
 STEP1: create fingerprint of drive c:\\ on a clean system:
  fp.exe files --fp_dir=c:\\ --f_output=c:\\fp\\fp1.csv
+ fp.exe reg --f_output=c:\\fp\\reg1.csv
 
 STEP2: create fingerprint after installing, running and uninstalling the software:
  fp.exe files --fp_dir=c:\\ --f_output=c:\\fp\\fp2.csv
+ fp.exe reg --f_output=c:\\fp\\reg2.csv
 
 STEP3: create diff files. In that files all changes between clean and uninstalled state are stored:
  fp.exe files_diff --fp1=c:\\fp\\fp1.csv --fp2=c:\\fp\\fp2.csv --f_output=c:\\fp\\fp1-fp2.csv
+ fp.exe reg_diff --reg1=c:\\fp\\reg1.csv --reg2=c:\\fp\\reg2.csv --f_output=c:\\fp\\reg1-reg2.csv
 
 STEP4: reinstall the software
  use procmon to log all system activity and save the log as csv file "c:\\fp\\reinstall_procmon.csv"
 
-Filtering Procmon Logfiles and registry fingerprints will be explained soon, since it is in refractoring stage now.
+Filtering Procmon Logfiles will be explained soon, since it is in refractoring stage now.
  If You are inpatient You might use the old Version 1.6 (from releases) .
 
 
