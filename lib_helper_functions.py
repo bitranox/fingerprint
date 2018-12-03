@@ -1,6 +1,7 @@
 import ctypes
 import datetime
-from lib_fingerprint_files import *
+from lib_fp_files import *
+import lib_doctest_pycharm
 import logging
 import os
 from pathlib import Path
@@ -9,6 +10,7 @@ import time
 import traceback
 
 logger = logging.getLogger()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
 
 
 def convert_path_to_posix(path:str)->str:
@@ -30,6 +32,7 @@ def convert_datetime_to_float(time_datetime:datetime.datetime)->float:
 def is_run_as_admin()->bool:
     """
     >>> is_run_as_admin()
+    False
     """
     try:
         is_admin = os.getuid() == 0

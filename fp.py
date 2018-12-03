@@ -1,9 +1,9 @@
-import argparse
 import click
 from fp_conf import fp_conf, fp_files_conf, fp_diff_files_conf, fp_reg_conf
 import lib_diff_files
-import lib_fingerprint_files
-import lib_fingerprint_registry
+import lib_doctest_pycharm
+import lib_fp_files
+import lib_fp_registry
 import lib_helper_functions
 import logging
 import multiprocessing
@@ -12,6 +12,8 @@ import sys
 import time
 
 logger = logging.getLogger()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
+
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -71,7 +73,7 @@ def files(**kwargs):
     check_or_request_f_output()
     lib_helper_functions.SetupFileLogging(f_output=fp_conf.f_output)
     log_files_parameter()
-    with lib_fingerprint_files.FingerPrintFiles() as fingerprint_files:
+    with lib_fp_files.FingerPrintFiles() as fingerprint_files:
         if fp_files_conf.multiprocessing:                # test c:\windows : 66 seconds
             fingerprint_files.create_fp_mp()
         else:
@@ -115,7 +117,7 @@ def files_diff(**kwargs):
 
 @fp.command()
 @click.option('--f_output', type=click.Path(), default='', help='path to the output file, e.g. c:\\results\\fp_registry_result1.csv')
-@click.option('--field_length_limit', type=click.INT, default=32767, help='data from registry, default set to maximum length of a cell in excel (32767) - but we can support much longer fields')
+@click.option('--field_length_limit', type=click.INT, default=32767, help='truncate data from registry, default set to maximum length of a cell in excel (32767) - but we can support much longer fields')
 @click.option('--reg_save_additional_parameters', default='', help='optional reg save parameters, e.g. "/reg:64" or "/reg:32"')
 @click.option('--do_not_delete_hive_copies', is_flag=True, help='do not delete the registry hive files')
 @click.option('--no_admin', is_flag=True, help='do not check for admin rights, not recommended')
@@ -132,7 +134,7 @@ def reg(**kwargs):
     check_or_request_f_output(fp_conf.f_output)
     lib_helper_functions.SetupFileLogging(f_output=fp_conf.f_output)
     log_reg_parameter()
-    with lib_fingerprint_registry.FingerPrintRegistry() as fingerprint_registry:
+    with lib_fp_registry.FingerPrintRegistry() as fingerprint_registry:
         fingerprint_registry.create_fingerprint_registry()
     exit_message()
 
@@ -251,8 +253,6 @@ def check_or_request_f_output(test_input:str= ''):
 def check_or_request_fp_dir(test_input:str= ''):
     """
     >>> import test
-    >>> import lib_doctest
-    >>> lib_doctest.setup_doctest_logger()
     >>> timestamp = time.time()
     >>> test.create_testfiles_fingerprint_1(timestamp)
 
@@ -300,7 +300,7 @@ def is_fp_dir_ok()->bool:
     """
     # noinspection PyBroadException
     try:
-        lib_fingerprint_files.format_fp_files_dir()
+        lib_fp_files.format_fp_files_dir()
         return True
     except Exception:
         return False
@@ -312,7 +312,6 @@ def is_f_output_ok(f_path:str)->bool:
     >>> is_f_output_ok(f_path='./testresults/fp_files_result_test')
     True
     >>> is_f_output_ok(f_path='x:/testresults/fp_files_result_test')
-    can not create x:/testresults/fp_files_result_test, probably not enough rights
     False
     """
     # noinspection PyBroadException

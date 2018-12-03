@@ -1,6 +1,6 @@
 import csv
 from lib_data_structures import *
-from lib_fingerprint_registry import FingerPrintRegistry
+from lib_fp_registry import FingerPrintRegistry
 
 class RegistryDiff(object):
     def __init__(self,

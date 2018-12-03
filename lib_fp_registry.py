@@ -1,6 +1,7 @@
 import csv
 from fp_conf import fp_conf, fp_reg_conf
 import lib_data_structures
+import lib_doctest_pycharm
 import lib_detect_encoding
 import lib_helper_functions
 import lib_registry
@@ -10,6 +11,7 @@ import os
 from Registry import Registry
 
 logger = logging.getLogger()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
 
 class FingerPrintRegistry(object):
     def __init__(self):
@@ -29,6 +31,7 @@ class FingerPrintRegistry(object):
     def create_fingerprint_registry(self):
         """
         >>> fingerprint_registry = FingerPrintRegistry()
+        >>> fp_conf.f_output = './testfiles/test_reg.csv'
         >>> fingerprint_registry.create_fingerprint_registry()
         """
         logger.info('create registry fingerprint')
@@ -56,7 +59,7 @@ class FingerPrintRegistry(object):
         maximum_field_length:int = 0
         logger.info('writing registry fingerprint to {}'.format(fp_conf.f_output))
         with open(fp_conf.f_output, 'w', encoding='utf-8',newline='') as f_out:
-            fieldnames = ['path', 'modified', 'value_name', 'value_type', 'value', 'change', 'value_old']
+            fieldnames = ['path', 'modified', 'value_name', 'value_type', 'value', 'change', 'remark']
             csv_writer = csv.DictWriter(f_out, fieldnames=fieldnames, dialect='excel')
             csv_writer.writeheader()
 
@@ -70,7 +73,7 @@ class FingerPrintRegistry(object):
                 data_dict['value_type'] = 'KEY'
                 data_dict['value'] = ''
                 data_dict['change'] = ''
-                data_dict['value_old'] = ''
+                data_dict['remark'] = ''
                 csv_writer.writerow(data_dict)
                 # write the values if any
                 for registry_value in registry_entry.l_registry_values:
@@ -352,3 +355,8 @@ class FingerPrintRegistry(object):
         """
         f_out_dir = os.path.dirname(fp_conf.f_output)
         return f_out_dir
+
+
+if __name__ == '__main__':
+    logger.info('this is a library and not intended to run stand alone')
+    lib_doctest_pycharm.testmod()

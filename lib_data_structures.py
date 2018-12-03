@@ -1,6 +1,11 @@
 from datetime import datetime
 import time
+import lib_doctest_pycharm
 import lib_helper_functions
+
+
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
+
 
 class DataStructFileInfo(object):
     def __init__(self):

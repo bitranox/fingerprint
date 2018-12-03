@@ -1,5 +1,5 @@
 from datetime import datetime
-from lib_fingerprint_files import *
+from lib_fp_files import *
 import os
 from pathlib import Path
 import shutil

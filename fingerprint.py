@@ -6,8 +6,8 @@
 ####################################################################################
 
 import argparse
-from lib_fingerprint_files import FingerPrintFiles
-from lib_fingerprint_registry import FingerPrintRegistry
+from lib_fp_files import FingerPrintFiles
+from lib_fp_registry import FingerPrintRegistry
 from lib_helper_functions import *
 import lib_doctest
 import logging

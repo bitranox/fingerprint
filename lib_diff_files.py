@@ -1,6 +1,11 @@
 import csv
 import lib_data_structures
+import lib_doctest_pycharm
+import logging
 from fp_conf import fp_diff_files_conf, fp_conf
+
+logger = logging.getLogger()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
 
 class FileDiff(object):
     def __init__(self):
@@ -121,3 +126,8 @@ def get_hashed_dict_fp_1()->{}:
         for dict_data in csv_reader:
             hashed_dict[dict_data['path']] = dict_data.copy()
     return hashed_dict
+
+
+if __name__ == '__main__':
+    logger.info('this is a library and not intended to run stand alone')
+    lib_doctest_pycharm.testmod()

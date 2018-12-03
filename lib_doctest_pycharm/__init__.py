@@ -1,0 +1,2 @@
+from lib_doctest_pycharm.lib_doctest_pycharm import setup_doctest_logger_for_pycharm as setup_doctest_logger_for_pycharm
+from lib_doctest_pycharm.lib_doctest_pycharm import testmod as testmod

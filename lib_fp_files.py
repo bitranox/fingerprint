@@ -3,6 +3,7 @@ import csv
 from fp_conf import fp_files_conf, fp_conf
 import glob
 import lib_data_structures
+import lib_doctest_pycharm
 import lib_hash
 import lib_helper_functions
 import logging
@@ -10,6 +11,7 @@ import os
 import time
 
 logger = logging.getLogger()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
 
 class FingerPrintFiles(object):
     def __init__(self):
@@ -204,3 +206,8 @@ def format_fp_files_dir()->str:
         raise RuntimeError('can not find the directory to fingerprint: {}'.format(fp_dir))
     fp_files_conf.fp_dir = fp_dir
     return fp_files_conf.fp_dir
+
+
+if __name__ == '__main__':
+    logger.info('this is a library and not intended to run stand alone')
+    lib_doctest_pycharm.testmod()
