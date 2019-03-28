@@ -12,7 +12,7 @@ import sys
 import time
 
 logger = logging.getLogger()
-lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()   # todo
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -66,7 +66,7 @@ def files(**kwargs):
 
     """
     files_save_commandline_options_to_conf(**kwargs)
-    lib_helper_functions.config_console_logger()
+    lib_helper_functions.setup_console_logger()
     lib_helper_functions.inform_if_not_run_as_admin(exit_if_not_admin=fp_files_conf.exit_if_not_admin, interactive=fp_conf.interactive)
     logger.info('create files fingerprint {}'.format(fp_conf.version))
     check_or_request_fp_dir()
@@ -103,7 +103,7 @@ def files_diff(**kwargs):
     """
 
     diff_files_save_commandline_options_to_conf(**kwargs)
-    lib_helper_functions.config_console_logger()
+    lib_helper_functions.setup_console_logger()
     logger.info('create file fingerprint diff {}'.format(fp_conf.version))
 
     fp_diff_files_conf.fp1_path = check_or_request_fp_file(f_input_file=fp_diff_files_conf.fp1_path, file_number=1)
@@ -128,7 +128,7 @@ def reg(**kwargs):
     """
 
     reg_save_commandline_options_to_conf(**kwargs)
-    lib_helper_functions.config_console_logger()
+    lib_helper_functions.setup_console_logger()
     lib_helper_functions.inform_if_not_run_as_admin(exit_if_not_admin=fp_reg_conf.exit_if_not_admin, interactive=fp_conf.interactive)
     logger.info('create registry fingerprint {}'.format(fp_conf.version))
     check_or_request_f_output(fp_conf.f_output)

@@ -84,7 +84,7 @@ class DataStructFileInfo(object):
     @created.setter
     def created(self,created:datetime):
         self._created = created
-        self._created_float = lib_helper_functions.convert_datetime_to_float(created)
+        self._created_float = lib_helper_functions.convert_datetime_or_datestr_to_float(created)
 
     @property
     def modified_float(self)->float:
@@ -102,7 +102,7 @@ class DataStructFileInfo(object):
     @modified.setter
     def modified(self,modified:datetime):
         self._modified = modified
-        self._modified_float = lib_helper_functions.convert_datetime_to_float(modified)
+        self._modified_float = lib_helper_functions.convert_datetime_or_datestr_to_float(modified)
 
     @property
     def accessed_float(self)->float:
@@ -120,7 +120,7 @@ class DataStructFileInfo(object):
     @accessed.setter
     def accessed(self,accessed:datetime):
         self._accessed = accessed
-        self._accessed_float = lib_helper_functions.convert_datetime_to_float(accessed)
+        self._accessed_float = lib_helper_functions.convert_datetime_or_datestr_to_float(accessed)
 
     def get_data_dict(self)->dict:
         """

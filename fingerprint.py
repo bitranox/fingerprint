@@ -69,7 +69,7 @@ def main(fingerprint_name:str,
 
     """
 
-    config_console_logger()
+    setup_console_logger()
     inform_if_not_run_as_admin()
     logger.info('create fingerprint')
     logger.info('fingerprinting drive : {}'.format(fingerprint_drive))

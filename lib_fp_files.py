@@ -106,7 +106,7 @@ class FingerPrintFiles(object):
                         csv_writer.writerow(fileinfo.get_data_dict())
         logger.info('{} files fingerprinted'.format(n_files))
 
-def get_fileinfo(filename:str, hash_files:bool=True):   # we need to pass hash_files because state of conf.hash_files gets lost in MP
+def get_fileinfo(filename:str, hash_files:bool = True):   # we need to pass hash_files because state of conf.hash_files gets lost in MP
     """
     >>> import test
     >>> timestamp = time.time()
@@ -175,6 +175,7 @@ def format_fp_files_dir()->str:
         ...
     RuntimeError: can not find the directory to fingerprint: does_not_exist\\
 
+    >>> # only for doctest - filtering procmon will not work for relative directories
     >>> fp_files_conf.fp_dir='./testfiles/'
     >>> format_fp_files_dir()
     '.\\\\testfiles\\\\'

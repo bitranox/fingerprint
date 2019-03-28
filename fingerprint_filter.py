@@ -7,12 +7,12 @@
 import argparse
 from lib_filter_procmon import ProcmonDiff
 from lib_helper_functions import *
-import lib_doctest
+import lib_doctest_pycharm
 import logging
 import sys
 
 logger = logging.getLogger()
-lib_doctest.setup_doctest_logger()
+lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
 
 def get_commandline_parameters():
     """
@@ -78,7 +78,7 @@ def main(procmon_csv:str,
     >>> main(procmon_csv='procmon-logfile', fingerprint_file_csv='test_c_files', fingerprint_reg_csv='test_registry', fingerprint_result_dir='c:/fingerprint')
 
     """
-    config_console_logger()
+    setup_console_logger()
 
     logger.info('filter procmon logfile from fingerprints')
 

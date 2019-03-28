@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 import time
 import traceback
+from typing import Union
 
 logger = logging.getLogger()
 lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
@@ -18,16 +19,57 @@ def convert_path_to_posix(path:str)->str:
     return posix_path
 
 def convert_float_to_datetime(time_float:float)->datetime.datetime:
+    """
+    >>> convert_float_to_datetime(1542221218.076271)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    datetime.datetime(2018, 11, 14, 19, 46, 58, 76271)
+    >>> dt = datetime.datetime(year=2018,month=11,day=14,hour=19,minute=46,second=58,microsecond=76271)
+    >>> # noinspection PyTypeChecker
+    >>> convert_float_to_datetime(dt)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+        ...
+    TypeError: an integer is required (got type datetime.datetime)
+
+    """
     return datetime.datetime.fromtimestamp(time_float)
 
-def convert_datetime_to_float(time_datetime:datetime.datetime)->float:
+def convert_datetime_or_datestr_to_float(time_datetime:Union[datetime.datetime,str])->float:
     """
-    >>> convert_datetime_to_float("2018-11-14 19:46:58.076271")
+    >>> convert_datetime_or_datestr_to_float("2018-11-14 19:46:58.076271")
     1542221218.076271
+    >>> dt = datetime.datetime(year=2018,month=11,day=14,hour=19,minute=46,second=58,microsecond=76271)
+    >>> convert_datetime_or_datestr_to_float(dt)
+    1542221218.076271
+    >>> # noinspection PyTypeChecker
+    >>> convert_datetime_or_datestr_to_float(1542221218.076271)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+        ...
+    TypeError: a str or datetime.datetime is required (got "1542221218.076271")
+
     """
     if isinstance(time_datetime, str):
-        time_datetime = datetime.datetime.strptime(time_datetime, "%Y-%m-%d %H:%M:%S.%f")
-    return time.mktime(time_datetime.timetuple()) + time_datetime.microsecond / 1E6
+        dt = datetime.datetime.strptime(time_datetime, "%Y-%m-%d %H:%M:%S.%f")
+        return time.mktime(dt.timetuple()) + dt.microsecond / 1E6
+    elif isinstance(time_datetime, datetime.datetime):
+        return time.mktime(time_datetime.timetuple()) + time_datetime.microsecond / 1E6
+    else:
+        raise TypeError('a str or datetime.datetime is required (got "{}")'.format(time_datetime))
+
+def convert_datestr_to_datetime(date_str:str)->datetime.datetime:
+    """
+    >>> convert_datestr_to_datetime("2018-11-14 19:46:58.076271")
+    datetime.datetime(2018, 11, 14, 19, 46, 58, 76271)
+    >>> # noinspection PyTypeChecker
+    >>> convert_datestr_to_datetime(1542221218.076271)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+        ...
+    TypeError: strptime() argument 1 must be str, not float
+
+
+    """
+
+    time_datetime = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
+    return time_datetime
+
 
 def is_run_as_admin()->bool:
     """
@@ -58,7 +100,7 @@ def is_run_as_admin2() -> bool:
             return False
 
 
-def inform_if_not_run_as_admin(exit_if_not_admin:bool=False, interactive:bool=False):
+def inform_if_not_run_as_admin(exit_if_not_admin:bool = False, interactive:bool = False):
     if not is_run_as_admin():
         logger.warning('this program should run with elevated rights (run as Administrator)')
         logger_flush_all_handlers()
@@ -67,7 +109,7 @@ def inform_if_not_run_as_admin(exit_if_not_admin:bool=False, interactive:bool=Fa
         if exit_if_not_admin:
             sys.exit(1)
 
-def log_exception_traceback(s_error:str= '', log_level:int=logging.WARNING, log_level_traceback:int=logging.DEBUG, flush_handlers:bool=False)->str:
+def log_exception_traceback(s_error:str = '', log_level:int = logging.WARNING, log_level_traceback:int = logging.DEBUG, flush_handlers:bool = False)->str:
     s_message = s_error
     if s_error:
         s_message += ' :'
@@ -87,21 +129,22 @@ def logger_flush_all_handlers():
             handler.flush()
     time.sleep(0.1)
 
-def config_console_logger():
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
+def setup_console_logger(level:int = logging.INFO):
+    console = logging.StreamHandler(stream=sys.stdout)
+    console.setLevel(level)
     datefmt = '%y-%m-%d %H:%M:%S'
     formatter = logging.Formatter('[%(asctime)s] %(levelname)-8s: %(message)s', datefmt)
     console.setFormatter(formatter)
     logging.getLogger().addHandler(console)
+    logging.getLogger().setLevel(level)
 
-def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+def str2bool(v:str)->bool:
+    if v.lower() in ('yes', 'true', 't', 'y', '1', 'j', 'ja'):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower() in ('no', 'false', 'f', 'n', '0', 'nein'):
         return False
     else:
-        raise RuntimeError('Boolean value expected.')
+        raise RuntimeError('can not convert "{}" to boolean'.format(v))
 
 def strip_extension(file_fullpath:str)->str:
     """

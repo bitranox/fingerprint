@@ -15,8 +15,9 @@ class CommandResponse(object):
         self.stdout:str = ''
         self.stderr: str = ''
 
-def run_command(s_command:str, shell:bool=False, communicate:bool=True, wait_finish:bool=True, raise_on_error:bool=True)->CommandResponse:
+def run_command(s_command:str, shell:bool = False, communicate:bool = True, wait_finish:bool = True, raise_on_error:bool = True)->CommandResponse:
     """
+    TODO - LOGGING ON/OF/LEVEL/ETC before use it !!!
     >>> response = run_command('dir c:\python3', shell=True) # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     >>> response.stdout # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
 
@@ -65,7 +66,7 @@ def run_command(s_command:str, shell:bool=False, communicate:bool=True, wait_fin
     return command_response
 
 
-def shlex_split_multi_platform(s_commandline:str, n_platform:int=None)->[str]:
+def shlex_split_multi_platform(s_commandline:str, n_platform:int = None)->[str]:
     """
     Multi-n_platform variant of shlex.split() for command-line splitting.
     For use with subprocess, for argv injection etc. Using fast REGEX.

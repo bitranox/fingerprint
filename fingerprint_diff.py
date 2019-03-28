@@ -69,7 +69,7 @@ def main(fingerprint_name_1:str,
     >>> main(fingerprint_name_1='test', fingerprint_name_2='test2', fp_dir='c:/', fingerprint_result_dir='c:/test')
 
     """
-    config_console_logger()
+    setup_console_logger()
 
     logger.info('create difference between fingerprints:\n\ndrive: {}\nresults directory: {}\nregistry field_length_limit: {}\ncheck_modified_date: {}\n\n'
                 .format(fingerprint_drive, fingerprint_result_dir, field_length_limit, check_modified))
