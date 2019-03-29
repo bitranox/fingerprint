@@ -26,6 +26,7 @@
 
 * **Please tell us about your environment:**
 
+- Release Number of the Repository used :
 - Python Version : 
 - OS, OS Version : 
 
