@@ -96,7 +96,7 @@ def modify_testfiles_fingerprint_2(timestamp:time):
     True
     """
 
-    atime = mtime = round(timestamp,6)
+    atime = mtime = round(timestamp, 6)
     os.remove('./testfiles/file5_change_creation_date.txt')
     shutil.copy('./testfiles_source/file2_added.txt', './testfiles/')
     os.remove('./testfiles/file8_deleted.txt')
