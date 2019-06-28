@@ -2,10 +2,12 @@ import hashlib
 import os
 import time
 
+
 def hash_bytestr_iter(bytesiter, hasher, ashexstr=True):
     for block in bytesiter:
         hasher.update(block)
     return hasher.hexdigest() if ashexstr else hasher.digest()
+
 
 def file_as_blockiter(afile, blocksize=65536):
     with afile:
@@ -14,11 +16,13 @@ def file_as_blockiter(afile, blocksize=65536):
             yield block
             block = afile.read(blocksize)
 
-def get_file_hash(fname:str):
+
+def get_file_hash(fname: str):
     result = hash_bytestr_iter(file_as_blockiter(open(fname, 'rb')), hashlib.sha256())
     return result
 
-def get_file_hash_preserve_access_dates(fname:str):
+
+def get_file_hash_preserve_access_dates(fname: str):
     """
     :param fname:
     :return:
@@ -37,10 +41,12 @@ def get_file_hash_preserve_access_dates(fname:str):
     set_atime_mtime(fname, atime, mtime)    # preserve access and modify dates
     return result
 
-def get_atime_mtime(f_name:str)->(time.time, time.time):
+
+def get_atime_mtime(f_name: str) -> (time.time, time.time):
     atime = os.path.getatime(f_name)
     mtime = os.path.getmtime(f_name)
     return atime, mtime
 
-def set_atime_mtime(f_name:str, atime:time.time, mtime:time.time):
+
+def set_atime_mtime(f_name: str, atime: time.time, mtime: time.time):
     os.utime(f_name, (atime, mtime))
