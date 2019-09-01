@@ -1,21 +1,27 @@
 """Setuptools entry point."""
 import codecs
-import pathlib
-from typing import Dict, List
+import os
+# we can not import typing or pathlib here - because of Python 2.7
 
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-package_name = 'lib_regexp'
-required: List = list()
-required_for_tests: List = list()
-entry_points: Dict = dict()
+# PYTHON 2.7 compatible version - no typing here because of Python 2.7
+package_name = 'fingerprint'   # type: ignore
+required = ['chardet',
+            'click',
+            'python-registry @ git+https://github.com/williballenthin/python-registry.git']     # type: ignore
+required_for_tests = list()     # type: ignore
+entry_points = dict()           # type: ignore
 
 
-def get_version(dist_directory: str) -> str:
-    with open(pathlib.Path(__file__).parent / '{dist_directory}/version.txt'.format(dist_directory=dist_directory), mode='r') as version_file:
+def get_version(dist_directory):
+    # type: (str) -> str
+    # PYTHON 2.7 compatible version - lib_registry is needed for lib_platform
+    path_version_file = os.path.join(os.path.dirname(__file__), dist_directory, 'version.txt')
+    with open(path_version_file, mode='r') as version_file:
         version = version_file.readline()
     return version
 
@@ -30,12 +36,14 @@ CLASSIFIERS = [
     'Topic :: Software Development :: Libraries :: Python Modules'
 ]
 
-path_readme = pathlib.Path(__file__).parent / 'README.rst'
+
+# PYTHON 2.7 compatible version - lib_registry is needed for lib_platform
 long_description = package_name
-if path_readme.exists():
+path_readme = os.path.join(os.path.dirname(__file__), 'README.rst')
+if os.path.exists(path_readme):
     # noinspection PyBroadException
     try:
-        readme_content = codecs.open(str(path_readme), encoding='utf-8').read()
+        readme_content = codecs.open(path_readme, encoding='utf-8').read()
         long_description = readme_content
     except Exception:
         pass
@@ -45,6 +53,7 @@ setup(name=package_name,
       version=get_version(package_name),
       url='https://github.com/bitranox/{package_name}'.format(package_name=package_name),
       packages=[package_name],
+      package_data={package_name: ['version.txt']},
       description=package_name,
       long_description=long_description,
       long_description_content_type='text/x-rst',
@@ -64,8 +73,8 @@ setup(name=package_name,
 
       # specify what a project minimally needs to run correctly
       install_requires=['typing', 'pathlib'] + required + required_for_tests,
-      # minimally needs to run the setup script, dependencies needs also to put here for setup.py install test
+      # minimally needs to run the setup script, dependencies must not put here
       setup_requires=['typing',
                       'pathlib',
-                      'pytest-runner'] + required
+                      'pytest-runner']
       )
