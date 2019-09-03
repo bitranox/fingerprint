@@ -1,7 +1,7 @@
 """Setuptools entry point."""
 import codecs
 import os
-# we can not import typing or pathlib here - because of Python 2.7
+from typing import List
 
 try:
     from setuptools import setup
@@ -24,6 +24,30 @@ def get_version(dist_directory):
     with open(path_version_file, mode='r') as version_file:
         version = version_file.readline()
     return version
+
+
+def is_travis_deploy() -> bool:
+    if 'travis_deploy' in os.environ:
+        if os.environ['travis_deploy'] == 'True':
+            return True
+    return False
+
+
+def strip_links_from_required(l_required: List[str]) -> List[str]:
+    """
+    >>> required = ['lib_regexp @ git+https://github.com/bitranox/lib_regexp.git', 'test']
+    >>> assert strip_links_from_required(required) == ['lib_regexp', 'test']
+
+    """
+    l_req_stripped = list()                                        # type: List[str]
+    for req in l_required:
+        req_stripped = req.split('@')[0].strip()
+        l_req_stripped.append(req_stripped)
+    return l_req_stripped
+
+
+if is_travis_deploy():
+    required = strip_links_from_required(required)
 
 
 CLASSIFIERS = [
