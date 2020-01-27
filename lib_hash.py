@@ -5,7 +5,7 @@ import time
 
 def hash_bytestr_iter(bytesiter, hasher, ashexstr=True):
     for block in bytesiter:
-        hasher.update(block)
+        hasher.apt_update(block)
     return hasher.hexdigest() if ashexstr else hasher.digest()
 
 
