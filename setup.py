@@ -67,7 +67,7 @@ path_readme = os.path.join(os.path.dirname(__file__), 'README.rst')
 if os.path.exists(path_readme):
     # noinspection PyBroadException
     try:
-        readme_content = codecs.open(path_readme, encoding='utf-8').read()
+        readme_content = codecs.open(str(path_readme), encoding='utf-8').read()
         long_description = readme_content
     except Exception:
         pass
