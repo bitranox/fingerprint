@@ -5,7 +5,7 @@ from typing import List
 
 try:
     from setuptools import setup
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     from distutils.core import setup
 
 # PYTHON 2.7 compatible version - no typing here because of Python 2.7
