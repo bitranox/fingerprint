@@ -104,7 +104,7 @@ class FingerPrintRegistry(object):
             l_all_reg_entries = l_all_reg_entries + l_reg_entries
         return l_all_reg_entries
 
-    def parse_hive(self, registry_file_info:lib_data_structures.DataStructRegistryFileInfo)->[lib_data_structures.DataStructRegistryEntry]:
+    def parse_hive(self, registry_file_info: lib_data_structures.DataStructRegistryFileInfo) -> [lib_data_structures.DataStructRegistryEntry]:
         """
         >>> fingerprint_registry = FingerPrintRegistry()
         >>> registry_file_info = lib_data_structures.DataStructRegistryFileInfo()
@@ -120,7 +120,7 @@ class FingerPrintRegistry(object):
         l_reg_entries = self.get_registry_entries(key=key_root, registry_file_info=registry_file_info)
         return l_reg_entries
 
-    def get_registry_entries(self, key:Registry.RegistryKey, registry_file_info:lib_data_structures.DataStructRegistryFileInfo)->[lib_data_structures.DataStructRegistryEntry]:
+    def get_registry_entries(self, key: Registry.RegistryKey, registry_file_info: lib_data_structures.DataStructRegistryFileInfo) -> [lib_data_structures.DataStructRegistryEntry]:
         l_reg_entries = list()
         l_registry_values = list()
         registry_entry = lib_data_structures.DataStructRegistryEntry()
