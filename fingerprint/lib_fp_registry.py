@@ -10,6 +10,7 @@ import logging
 import os
 from Registry import Registry
 
+
 logger = logging.getLogger()
 lib_doctest_pycharm.setup_doctest_logger_for_pycharm()
 
@@ -184,7 +185,7 @@ class FingerPrintRegistry(object):
         key_path = registry_file_info.hive_name + '\\' + key_path
         return key_path
 
-    def copy_registry_files_and_return_copied(self)->[lib_data_structures.DataStructRegistryFileInfo]:
+    def copy_registry_files_and_return_copied(self) -> [lib_data_structures.DataStructRegistryFileInfo]:
         """
         >>> fingerprint_registry = FingerPrintRegistry()
         >>> fp_conf.f_output = 'c:/test/test.csv'
@@ -206,7 +207,7 @@ class FingerPrintRegistry(object):
                 logger.error('can not write {}, needs to run as Administrator'.format(registry_file_info.filename))
         return l_registry_file_infos_copied
 
-    def get_l_registry_file_infos(self)->[lib_data_structures.DataStructRegistryFileInfo]:
+    def get_l_registry_file_infos(self) -> [lib_data_structures.DataStructRegistryFileInfo]:
         """
         >>> fingerprint_registry = FingerPrintRegistry()
         >>> fp_conf.f_output = 'c:/test/test.csv'
@@ -292,7 +293,7 @@ class FingerPrintRegistry(object):
         return l_hives
 
     @staticmethod
-    def copy_registry_file(registry_file_info:lib_data_structures.DataStructRegistryFileInfo):
+    def copy_registry_file(registry_file_info: lib_data_structures.DataStructRegistryFileInfo):
         """
         >>> fp_conf.f_output = 'c:/testfiles/test_öäüß€_reg.csv'
         >>> fingerprint_registry = FingerPrintRegistry()
