@@ -82,7 +82,7 @@ setup(name=package_name,
       long_description=long_description,
       long_description_content_type='text/x-rst',
       author='Robert Nowotny',
-      author_email='rnowotny1966@gmail.com',
+      author_email='bitranox@gmail.com',
       classifiers=CLASSIFIERS,
       entry_points=entry_points,
       # minimally needs to run tests - no project requirements here
