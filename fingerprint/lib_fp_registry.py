@@ -148,7 +148,7 @@ class FingerPrintRegistry(object):
         return l_reg_entries
 
     @staticmethod
-    def get_registry_value(value)->str:
+    def get_registry_value(value) -> str:
         try:
             registry_value = value.value()
         except (AttributeError, Registry.RegistryParse.UnknownTypeException, TypeError, UnicodeDecodeError):
