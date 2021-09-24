@@ -59,14 +59,14 @@ def get_logfile_fullpath(fingerprint_result_dir, procmon_csv:str, fingerprint_fi
     procmon_csv = procmon_csv.lower().rsplit('.csv',1)[0]
     fingerprint_file_csv = fingerprint_file_csv.lower().rsplit('.csv', 1)[0]
     fingerprint_reg_csv = fingerprint_reg_csv.lower().rsplit('.csv', 1)[0]
-    logfile_fullpath = convert_path_to_posix(os.path.join(fingerprint_result_dir, ('PM_{}_FPF_{}_FPR_{}.log'.format(procmon_csv, fingerprint_file_csv, fingerprint_reg_csv))))
+    logfile_fullpath = convert_path_to_posix(os.path.join(fingerprint_result_dir, f'PM_{procmon_csv}_FPF_{fingerprint_file_csv}_FPR_{fingerprint_reg_csv}.log'))
     return logfile_fullpath
 
 
-def main(procmon_csv:str,
-         fingerprint_result_dir:str,
-         fingerprint_file_csv:str,
-         fingerprint_reg_csv:str):
+def main(procmon_csv: str,
+         fingerprint_result_dir: str,
+         fingerprint_file_csv: str,
+         fingerprint_reg_csv: str):
     """
     :param procmon_csv:                 the name of the procmon Logfile, e.g. 'procmon-logfile'
     :param fingerprint_result_dir:      the result dir, e.g. 'c:/fingerprint'

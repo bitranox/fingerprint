@@ -50,9 +50,9 @@ class FingerPrintFiles(object):
 
         """
 
-        logger.info('create fingerprint for files from {}, storing results in {}'.format(fp_files_conf.fp_dir, fp_conf.f_output))
+        logger.info(f'create fingerprint for files from {fp_files_conf.fp_dir}, storing results in {fp_conf.f_output}')
 
-        n_files:int = 0
+        n_files: int = 0
         file_iterator = get_file_iterator()
 
         with open(fp_conf.f_output, 'w', encoding='utf-8', newline='') as f_out:
@@ -62,7 +62,7 @@ class FingerPrintFiles(object):
             csv_writer.writeheader()
 
             for file in file_iterator:
-                fileinfo = get_fileinfo(filename=file,hash_files=fp_files_conf.hash_files)
+                fileinfo = get_fileinfo(filename=file, hash_files=fp_files_conf.hash_files)
                 if fileinfo is not None:
                     n_files += 1
                     csv_writer.writerow(fileinfo.get_data_dict())
@@ -87,9 +87,9 @@ class FingerPrintFiles(object):
 
         """
 
-        logger.info('create fingerprint for files from {}, storing results in {}'.format(fp_files_conf.fp_dir, fp_conf.f_output))
+        logger.info(f'create fingerprint for files from {fp_files_conf.fp_dir}, storing results in {fp_conf.f_output}')
 
-        n_files:int = 0
+        n_files: int = 0
         file_iterator = get_file_iterator()
 
         with open(fp_conf.f_output, 'w', encoding='utf-8', newline='') as f_out:
@@ -98,15 +98,16 @@ class FingerPrintFiles(object):
             csv_writer.writeheader()
 
             with concurrent.futures.ProcessPoolExecutor(max_workers=int(os.cpu_count()-1)) as executor:
-                fileinfo_futures = [executor.submit(get_fileinfo,filename=filename,hash_files=fp_files_conf.hash_files) for filename in file_iterator]
+                fileinfo_futures = [executor.submit(get_fileinfo, filename=filename, hash_files=fp_files_conf.hash_files) for filename in file_iterator]
                 for fileinfo_future in concurrent.futures.as_completed(fileinfo_futures):
                     fileinfo = fileinfo_future.result()
                     if fileinfo is not None:
                         n_files += 1
                         csv_writer.writerow(fileinfo.get_data_dict())
-        logger.info('{} files fingerprinted'.format(n_files))
+        logger.info(f'{n_files} files fingerprinted')
 
-def get_fileinfo(filename:str, hash_files:bool = True):   # we need to pass hash_files because state of conf.hash_files gets lost in MP
+
+def get_fileinfo(filename: str, hash_files: bool = True):   # we need to pass hash_files because state of conf.hash_files gets lost in MP
     """
     >>> import test
     >>> timestamp = time.time()
@@ -130,8 +131,8 @@ def get_fileinfo(filename:str, hash_files:bool = True):   # we need to pass hash
     'access denied'
     """
 
-    dict_attribute_functions = {'accessed_float':os.path.getatime, 'modified_float':os.path.getmtime,
-                                'created_float':os.path.getctime,'size':os.path.getsize, 'hash':lib_hash.get_file_hash_preserve_access_dates}
+    dict_attribute_functions = {'accessed_float': os.path.getatime, 'modified_float': os.path.getmtime,
+                                'created_float': os.path.getctime, 'size': os.path.getsize, 'hash': lib_hash.get_file_hash_preserve_access_dates}
 
     fileinfo = lib_data_structures.DataStructFileInfo()
     fileinfo.path = filename
@@ -149,28 +150,31 @@ def get_fileinfo(filename:str, hash_files:bool = True):   # we need to pass hash
             fileinfo.remark = 'access denied'
     return fileinfo
 
+
 def get_file_iterator():
     glob_filter = fp_files_conf.fp_dir + '**'
     file_iter = glob.iglob(glob_filter, recursive=True)
     return file_iter
 
+
 def check_f_output_permission():
     lib_helper_functions.create_path_and_check_permission(fp_conf.f_output)
     os.remove(fp_conf.f_output)
 
-def format_fp_files_dir()->str:
+
+def format_fp_files_dir() -> str:
     """
     >>> fp_files_conf.fp_dir='c:/'
     >>> format_fp_files_dir()
     'C:\\\\'
     >>> fp_files_conf.fp_dir='c'
-    >>> format_fp_files_dir()  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> format_fp_files_dir()
     Traceback (most recent call last):
         ...
     RuntimeError: can not find the directory to fingerprint: c\\
 
     >>> fp_files_conf.fp_dir='does_not_exist/'
-    >>> format_fp_files_dir()  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> format_fp_files_dir()
     Traceback (most recent call last):
         ...
     RuntimeError: can not find the directory to fingerprint: does_not_exist\\
@@ -181,13 +185,13 @@ def format_fp_files_dir()->str:
     '.\\\\testfiles\\\\'
 
     >>> fp_files_conf.fp_dir=''
-    >>> format_fp_files_dir() # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> format_fp_files_dir()
     Traceback (most recent call last):
     ...
     RuntimeError: no directory to fingerprint
 
     >>> fp_files_conf.fp_dir='./not_exist/'
-    >>> format_fp_files_dir() # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    >>> format_fp_files_dir()
     Traceback (most recent call last):
     ...
     RuntimeError: can not find the directory to fingerprint: .\\not_exist\\

@@ -75,7 +75,7 @@ if os.path.exists(path_readme):
 
 setup(name=package_name,
       version=get_version(package_name),
-      url='https://github.com/bitranox/{package_name}'.format(package_name=package_name),
+      url=f'https://github.com/bitranox/{package_name}',
       packages=[package_name],
       package_data={package_name: ['version.txt']},
       description=package_name,
