@@ -54,7 +54,8 @@ def convert_datetime_or_datestr_to_float(time_datetime:Union[datetime.datetime,s
     else:
         raise TypeError('a str or datetime.datetime is required (got "{}")'.format(time_datetime))
 
-def convert_datestr_to_datetime(date_str:str)->datetime.datetime:
+
+def convert_datestr_to_datetime(date_str: str) -> datetime.datetime:
     """
     >>> convert_datestr_to_datetime("2018-11-14 19:46:58.076271")
     datetime.datetime(2018, 11, 14, 19, 46, 58, 76271)
@@ -71,7 +72,7 @@ def convert_datestr_to_datetime(date_str:str)->datetime.datetime:
     return time_datetime
 
 
-def is_run_as_admin()->bool:
+def is_run_as_admin() -> bool:
     """
     >>> is_run_as_admin()
     False
@@ -100,7 +101,7 @@ def is_run_as_admin2() -> bool:
             return False
 
 
-def inform_if_not_run_as_admin(exit_if_not_admin:bool = False, interactive:bool = False):
+def inform_if_not_run_as_admin(exit_if_not_admin: bool = False, interactive: bool = False):
     if not is_run_as_admin():
         logger.warning('this program should run with elevated rights (run as Administrator)')
         logger_flush_all_handlers()
@@ -109,14 +110,15 @@ def inform_if_not_run_as_admin(exit_if_not_admin:bool = False, interactive:bool 
         if exit_if_not_admin:
             sys.exit(1)
 
-def log_exception_traceback(s_error:str = '', log_level:int = logging.WARNING, log_level_traceback:int = logging.DEBUG, flush_handlers:bool = False)->str:
+
+def log_exception_traceback(s_error: str = '', log_level: int = logging.WARNING, log_level_traceback: int = logging.DEBUG, flush_handlers: bool = False) -> str:
     s_message = s_error
     if s_error:
         s_message += ' :'
     s_message += str(sys.exc_info()[1])
     logger.log(log_level, s_message)
 
-    s_traceback:str = traceback.format_exc()
+    s_traceback: str = traceback.format_exc()
     logger.log(log_level_traceback, s_traceback)
     if flush_handlers:
         logger_flush_all_handlers()
