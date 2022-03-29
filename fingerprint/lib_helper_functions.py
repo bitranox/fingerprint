@@ -128,7 +128,12 @@ def logger_flush_all_handlers():
     flush_logger = logging.getLogger()
     for handler in flush_logger.handlers:
         if hasattr(handler, 'flush'):
-            handler.flush()
+            try:
+                handler.flush()
+            except ValueError:
+                # we have got ValueError: underlying buffer has been detached on github Actions Windows
+                pass
+
     time.sleep(0.1)
 
 def setup_console_logger(level:int = logging.INFO):
