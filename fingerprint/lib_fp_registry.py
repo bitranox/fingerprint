@@ -153,7 +153,7 @@ class FingerPrintRegistry(object):
             registry_value = value.value()
         except (AttributeError, Registry.RegistryParse.UnknownTypeException, TypeError, UnicodeDecodeError):
             value_raw = value.raw_data()
-            encoding = lib_detect_encoding.detect_encoding(value_raw)
+            encoding = lib_detect_encoding.get_file_encoding(value_raw)
             registry_value = value_raw.decode(encoding)
         return registry_value
 

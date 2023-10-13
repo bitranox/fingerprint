@@ -41,7 +41,7 @@ def run_command(s_command:str, shell:bool = False, communicate:bool = True, wait
 
     if communicate:
         stdout, stderr = my_process.communicate()
-        encoding = lib_detect_encoding.detect_encoding(stdout+stderr)
+        encoding = lib_detect_encoding.get_file_encoding(stdout + stderr)
         stdout = stdout.decode(encoding)
         stderr = stderr.decode(encoding)
         returncode = my_process.returncode
