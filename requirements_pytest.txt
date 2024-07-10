@@ -9,3 +9,4 @@ pytest-pep8 ; python_version < "3.5"
 pytest-pycodestyle ; python_version >= "3.5"
 pytest-mypy ; platform_python_implementation != "PyPy" and python_version >= "3.5"
 pytest-runner
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
